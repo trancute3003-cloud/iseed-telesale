@@ -328,6 +328,8 @@ td.zcell input{width:20px;height:20px;cursor:pointer;accent-color:#2e9b4f}
 td.zcell.ok{background:#e9f6ee}
 .zmsgs{margin-top:16px;border:1px solid var(--line);border-radius:12px;padding:10px 14px;background:#fbfaf7}
 .zmsgs summary{cursor:pointer;font-weight:800;color:var(--dark);font-size:14px}
+.ccount{margin-top:6px;font-size:12px;font-weight:700;color:#2e7d32}
+.ccount.over{color:var(--red)}
 /* list */
 .lhead{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;margin-bottom:14px}
 .lhead h1{margin:0}
@@ -685,7 +687,7 @@ td.zcell.ok{background:#e9f6ee}
 <section class="tab" id="t-zalo" data-title="Zalo mẫu & lịch nhắc" data-n="10">
   <h1>Tin nhắn mẫu gửi Zalo và lịch nhắc</h1>
   <p class="lead">Bấm “Copy” rồi dán vào Zalo. Tên, đề tài, kênh tự điền theo thanh trên cùng và phiếu ghi nhận.</p>
-  <div class="say alt" data-label="LỜI MỜI KẾT BẠN ZALO" data-s>Chào {Kh}, Em là {em} - nhân viên Viện PTGD và QTBV (iSEED). Em vừa gọi điện thoại để thông tin đến {kh} về chương trình Mini MBA in Healthcare Service Management. Mong {kh} đồng ý kết bạn để em gửi tài liệu chi tiết ạ. Em cảm ơn {kh}!</div>
+  <div class="say alt" data-label="LỜI MỜI KẾT BẠN ZALO" data-s>Chào {Kh}, em vừa gọi từ viện iSEED để thông tin đến {kh} về khóa học Mini MBA in Healthcare. Em xin phép kết bạn để gửi tài liệu chi tiết ạ.</div>
   <div class="say alt" data-label="NGAY SAU KHI KẾT BẠN" data-s>Dạ em chào {Kh} {ten},
 Em là {em}, từ Viện Phát triển Giáo dục và Quản trị Bền vững (iSEED). Sau sự kiện ngày 24/10, em xin gửi {Kh} thông tin chi tiết về chương trình Mini MBA in Healthcare Service Management để {Kh} tham khảo. Đặc biệt, khách tham dự sự kiện ngày 24/10 đang được áp dụng chính sách học bổng và ưu đãi học phí riêng của chương trình
 📎 Em gửi kèm:
@@ -783,6 +785,7 @@ Trân trọng cảm ơn {Kh} và mong sớm nhận được phản hồi ạ.</d
   <h2 style="margin-bottom:4px">Sửa lời thoại</h2>
   <p class="note" id="edwhere" style="margin-top:0"></p>
   <textarea id="edta"></textarea>
+  <div class="note" id="edcnt" style="font-weight:700;margin:4px 0 0"></div>
   <div class="legend">Giữ nguyên các ô tự điền nếu cần: <code>{kh}</code> xưng hô (anh/chị) · <code>{Kh}</code> viết hoa đầu câu · <code>{ten}</code> tên khách · <code>{em}</code> tên bạn · <code>{hp}</code> học phần · <code>{tools}</code> 2 công cụ · <code>{detai}</code> đề tài · <code>{hen}</code> giờ hẹn</div>
   <details><summary class="note" style="cursor:pointer">Xem bản gốc trong kịch bản</summary><p class="note" id="edorig" style="white-space:pre-wrap"></p></details>
   <div class="bar"><button class="btn primary" id="edSave">Lưu</button><button class="btn" id="edRestore">Khôi phục bản gốc</button><button class="btn" data-close>Huỷ</button></div>
@@ -952,7 +955,7 @@ const T = {
   stop:'Dạ em cảm ơn {kh} và xin lỗi vì đã làm phiền {kh} ạ.',
   zNow:'Dạ em chào {Kh} {ten},\nEm là {em}, từ Viện Phát triển Giáo dục và Quản trị Bền vững (iSEED). Sau sự kiện ngày 24/10, em xin gửi {Kh} thông tin chi tiết về chương trình Mini MBA in Healthcare Service Management để {Kh} tham khảo. Đặc biệt, khách tham dự sự kiện ngày 24/10 đang được áp dụng chính sách học bổng và ưu đãi học phí riêng của chương trình\n📎 Em gửi kèm:\n- Thư ngỏ chương trình (thông tin chi tiết các học phần, chính sách học bổng dành cho khách tham dự sự kiện)\n- Brochure chương trình (nội dung tổng quan chương trình và đội ngũ giảng viên)\nKhi thuận tiện, kính mong {Kh} dành thời gian xem qua tài liệu. Em rất mong nhận được phản hồi của {Kh} để có thể tư vấn đầy đủ hơn về chương trình cũng như các chính sách ưu đãi khi đơn vị đăng ký theo nhóm.\nTrân trọng cảm ơn {Kh} và mong sớm nhận được phản hồi ạ.',
   zHen:'Dạ em đã ghi nhận thông tin của {kh}. Chuyên viên tư vấn của Viện sẽ liên hệ {kh} vào {hen} để trao đổi chi tiết hơn về chương trình ạ. Nếu khung giờ đó không tiện, {kh} nhắn lại giúp em nhé. Em cảm ơn {kh}!',
-  zInv:'Chào {Kh}, Em là {em} - nhân viên Viện PTGD và QTBV (iSEED). Em vừa gọi điện thoại để thông tin đến {kh} về chương trình Mini MBA in Healthcare Service Management. Mong {kh} đồng ý kết bạn để em gửi tài liệu chi tiết ạ. Em cảm ơn {kh}!',
+  zInv:'Chào {Kh}, em vừa gọi từ viện iSEED để thông tin đến {kh} về khóa học Mini MBA in Healthcare. Em xin phép kết bạn để gửi tài liệu chi tiết ạ.',
   zMiss:'Dạ em chào {kh}, em là {em} bên Viện iSEED. Em có gọi {kh} hai lần nhưng chưa liên lạc được ạ. Em xin phép gửi qua đây thông tin chương trình đào tạo của Viện và chính sách học bổng dành cho {kh} làm trong lĩnh vực y tế. Khi nào thuận tiện {kh} nhắn lại giúp em nhé. Em cảm ơn {kh}!',
 };
 const obj = id => OBJS.find(o=>o.id===id).b.filter(x=>x[0]!=='jump');
@@ -1376,7 +1379,8 @@ function renderCust(){
 }
 function sayHTML(tpl,label,i,key){
   const ed=key&&(key in EDITS);
-  return `<div class="say ${label?'alt':''} ${ed?'edited':''}" ${label?`data-label="${esc(label)}"`:''}>${fill(tpl,true)}<button class="btn sm cp" data-sayi="${i}">Copy</button>${EDIT&&key?`<button class="btn sm ed" data-edk="${esc(key)}">Sửa</button>`:''}</div>`;
+  const cnt=key==='T.zInv'?(()=>{const n=fill(tpl,false).length;return `<div class="ccount ${n>150?'over':''}">${n}/150 ký tự${n>150?' — quá giới hạn lời mời kết bạn Zalo':''}</div>`})():'';
+  return `<div class="say ${label?'alt':''} ${ed?'edited':''}" ${label?`data-label="${esc(label)}"`:''}>${fill(tpl,true)}${cnt}<button class="btn sm cp" data-sayi="${i}">Copy</button>${EDIT&&key?`<button class="btn sm ed" data-edk="${esc(key)}">Sửa</button>`:''}</div>`;
 }
 let SAYS=[];
 function blocksHTML(blocks){
@@ -1538,7 +1542,7 @@ $('#usptable tbody').innerHTML=TOPICS.map(t=>`<tr><td>${esc(t.hpShort)}</td><td>
 const refSays=$$('#v-ref .say');
 refSays.forEach(el=>{el._t=el.textContent.trim();el._k=keyOf(el._t);const b=document.createElement('button');b.className='btn sm cp';b.textContent='Copy';b.onclick=()=>copy(fill(el._cur,false));el._btn=b});
 function renderRefSay(){
-  refSays.forEach(el=>{el._cur=TXT(el._k,el._t);el.innerHTML=fill(el._cur,true);el.appendChild(el._btn);el.classList.toggle('edited',el._k in EDITS);
+  refSays.forEach(el=>{el._cur=TXT(el._k,el._t);el.innerHTML=fill(el._cur,true)+(el._k==='T.zInv'?(()=>{const n=fill(el._cur,false).length;return `<div class="ccount ${n>150?'over':''}">${n}/150 ký tự</div>`})():'');el.appendChild(el._btn);el.classList.toggle('edited',el._k in EDITS);
     if(EDIT&&USER){const e=document.createElement('button');e.className='btn sm ed';e.textContent='Sửa';e.dataset.edk=el._k;el.appendChild(e)}});
   $('#usptable tbody').innerHTML=TOPICS.map(t=>`<tr><td>${esc(t.hpShort)}</td><td>“${esc(TXT('U.'+t.id,t.usp))}”</td><td>${t.tools.map(esc).join(' · ')}</td></tr>`).join('');
 }
@@ -1599,6 +1603,8 @@ document.addEventListener('click',e=>{
   edKey=b.dataset.edk; const def=KEYDEF.get(edKey)||'';
   $('#edta').value=TXT(edKey,def); $('#edorig').textContent=def;
   $('#edwhere').textContent=`Bản sửa chỉ áp dụng cho ${USER}. Câu này dùng chung ở mọi chỗ xuất hiện trong kịch bản.`;
+  const upd=()=>{ $('#edcnt').textContent = edKey==='T.zInv' ? `${$('#edta').value.replace(/\{[kK]h\}/g,'anh/chị').replace(/\{em\}/g,ME||'').length}/150 ký tự (lời mời kết bạn Zalo tối đa 150)` : ''; };
+  $('#edta').oninput=upd; upd();
   openModal('mEdit'); setTimeout(()=>$('#edta').focus(),50);
 },true);
 $('#edSave').onclick=()=>{ const v=$('#edta').value.trim(), def=KEYDEF.get(edKey);
