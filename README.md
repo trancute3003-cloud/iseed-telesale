@@ -30,3 +30,19 @@ Nội dung bám theo kịch bản telesale phiên bản 09/11/2026 của Viện 
 ## Sửa nội dung
 Toàn bộ trong `index.html`. Học phần/USP/công cụ ở mảng `TOPICS`; mục 4b ở `BRIDGE`; xử lý từ chối ở `OBJS`; khách hay hỏi ở `FAQS`.
 Trong lời thoại, `{kh}` = xưng hô, `{ten}` = tên khách, `{em}` = tên người gọi, `{hp}` / `{usp}` / `{tools}` / `{detai}` = tự điền theo đề tài.
+
+## Người dùng
+- **Chen**, **Bảo Trân**: người gọi — mỗi người thấy khách của mình (cột Owner).
+- **Chị Huyền**: quản lý — mục 📈 Báo cáo (tiến độ từng người, lượt gọi 7 ngày, chuyên đề, khách MQL, khách cần gửi mail), xem Danh sách / Tổng kết / phiếu khách của cả nhóm (chỉ xem, không gọi).
+
+## Cài đồng bộ báo cáo (làm 1 lần, ~10 phút)
+1. Mở https://sheets.new → đặt tên **iSEED Telesale – Dữ liệu**.
+2. **Tiện ích mở rộng → Apps Script** → xoá code mẫu → dán toàn bộ file [`apps-script/Code.gs`](apps-script/Code.gs) → bấm 💾 Lưu.
+3. **Triển khai → Tuỳ chọn triển khai mới** → bánh răng ⚙️ chọn **Ứng dụng web**:
+   - *Thực thi dưới dạng*: **Tôi**
+   - *Người có quyền truy cập*: **Bất kỳ ai**
+   → **Triển khai** → **Cấp quyền truy cập** (chọn tài khoản Google → Nâng cao → Đi tới… → Cho phép).
+4. Copy **URL ứng dụng web** (dạng `https://script.google.com/macros/s/…/exec`).
+5. Trên web: bấm 👤 → **⚙️ Đồng bộ báo cáo** → dán link → nhập mật khẩu → Vào làm việc. (Hoặc gửi link cho Claude để gắn sẵn vào web cho cả nhóm.)
+
+Dữ liệu chỉ đọc/ghi được khi có mật khẩu mở danh sách khách (Apps Script chỉ lưu mã băm của mật khẩu).
