@@ -326,6 +326,8 @@ td.zcell{text-align:center;vertical-align:middle!important;border-left:1px solid
 td.zcell label{display:flex;justify-content:center;align-items:center;cursor:pointer;padding:8px}
 td.zcell input{width:20px;height:20px;cursor:pointer;accent-color:#2e9b4f}
 td.zcell.ok{background:#e9f6ee}
+.zmsgs{margin-top:16px;border:1px solid var(--line);border-radius:12px;padding:10px 14px;background:#fbfaf7}
+.zmsgs summary{cursor:pointer;font-weight:800;color:var(--dark);font-size:14px}
 /* list */
 .lhead{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;margin-bottom:14px}
 .lhead h1{margin:0}
@@ -683,6 +685,7 @@ td.zcell.ok{background:#e9f6ee}
 <section class="tab" id="t-zalo" data-title="Zalo mẫu & lịch nhắc" data-n="10">
   <h1>Tin nhắn mẫu gửi Zalo và lịch nhắc</h1>
   <p class="lead">Bấm “Copy” rồi dán vào Zalo. Tên, đề tài, kênh tự điền theo thanh trên cùng và phiếu ghi nhận.</p>
+  <div class="say alt" data-label="LỜI MỜI KẾT BẠN ZALO" data-s>Chào {Kh}, Em là {em} - nhân viên Viện PTGD và QTBV (iSEED). Em vừa gọi điện thoại để thông tin đến {kh} về chương trình Mini MBA in Healthcare Service Management. Mong {kh} đồng ý kết bạn để em gửi tài liệu chi tiết ạ. Em cảm ơn {kh}!</div>
   <div class="say alt" data-label="NGAY SAU KHI KẾT BẠN" data-s>Dạ em chào {Kh} {ten},
 Em là {em}, từ Viện Phát triển Giáo dục và Quản trị Bền vững (iSEED). Sau sự kiện ngày 24/10, em xin gửi {Kh} thông tin chi tiết về chương trình Mini MBA in Healthcare Service Management để {Kh} tham khảo. Đặc biệt, khách tham dự sự kiện ngày 24/10 đang được áp dụng chính sách học bổng và ưu đãi học phí riêng của chương trình
 📎 Em gửi kèm:
@@ -949,6 +952,7 @@ const T = {
   stop:'Dạ em cảm ơn {kh} và xin lỗi vì đã làm phiền {kh} ạ.',
   zNow:'Dạ em chào {Kh} {ten},\nEm là {em}, từ Viện Phát triển Giáo dục và Quản trị Bền vững (iSEED). Sau sự kiện ngày 24/10, em xin gửi {Kh} thông tin chi tiết về chương trình Mini MBA in Healthcare Service Management để {Kh} tham khảo. Đặc biệt, khách tham dự sự kiện ngày 24/10 đang được áp dụng chính sách học bổng và ưu đãi học phí riêng của chương trình\n📎 Em gửi kèm:\n- Thư ngỏ chương trình (thông tin chi tiết các học phần, chính sách học bổng dành cho khách tham dự sự kiện)\n- Brochure chương trình (nội dung tổng quan chương trình và đội ngũ giảng viên)\nKhi thuận tiện, kính mong {Kh} dành thời gian xem qua tài liệu. Em rất mong nhận được phản hồi của {Kh} để có thể tư vấn đầy đủ hơn về chương trình cũng như các chính sách ưu đãi khi đơn vị đăng ký theo nhóm.\nTrân trọng cảm ơn {Kh} và mong sớm nhận được phản hồi ạ.',
   zHen:'Dạ em đã ghi nhận thông tin của {kh}. Chuyên viên tư vấn của Viện sẽ liên hệ {kh} vào {hen} để trao đổi chi tiết hơn về chương trình ạ. Nếu khung giờ đó không tiện, {kh} nhắn lại giúp em nhé. Em cảm ơn {kh}!',
+  zInv:'Chào {Kh}, Em là {em} - nhân viên Viện PTGD và QTBV (iSEED). Em vừa gọi điện thoại để thông tin đến {kh} về chương trình Mini MBA in Healthcare Service Management. Mong {kh} đồng ý kết bạn để em gửi tài liệu chi tiết ạ. Em cảm ơn {kh}!',
   zMiss:'Dạ em chào {kh}, em là {em} bên Viện iSEED. Em có gọi {kh} hai lần nhưng chưa liên lạc được ạ. Em xin phép gửi qua đây thông tin chương trình đào tạo của Viện và chính sách học bổng dành cho {kh} làm trong lĩnh vực y tế. Khi nào thuận tiện {kh} nhắn lại giúp em nhé. Em cảm ơn {kh}!',
 };
 const obj = id => OBJS.find(o=>o.id===id).b.filter(x=>x[0]!=='jump');
@@ -1437,8 +1441,9 @@ const LABHINT={'MQL':'Nhu cầu rõ ràng → chuyển chị Huyền tư vấn c
 function renderEnd(){
   const t=topic(), cu=curCus(), lab=suggestLabel();
   const radios=(name,list,cur)=>`<div class="opts">${list.map(v=>`<label><input type="radio" name="${name}" value="${esc(v)}" ${v===cur?'checked':''}> ${esc(v)}</label>`).join('')}</div>`;
-  const z=[]; if(C.rec.f7==='Zalo') z.push(['NGAY SAU KHI KẾT BẠN (gửi trong 5 phút)',T.zNow]);
+  const z=[['① LỜI MỜI KẾT BẠN ZALO',T.zInv],['② SAU KHI KHÁCH ĐỒNG Ý KẾT BẠN — GỬI THÔNG TIN (trong 5 phút)',T.zNow]];
   if(lab==='MQL') z.push(['HẸN CHUYÊN VIÊN GỌI',T.zHen]);
+  const zOpen=C.rec.f7==='Zalo'||C.visited.has('busy');
   SAYS=[];
   $('#card').innerHTML=`<div class="cardnav"><button class="btn sm" id="back">← Quay lại</button><span class="note">Thời lượng: <b>${durStr()}</b></span></div>
     <h1>Ghi nhận cuộc gọi — ${esc(cu.name)}</h1>
@@ -1457,7 +1462,7 @@ function renderEnd(){
       <div><label class="t">12. Lý do không quan tâm</label><input type="text" id="e12" value="${esc(C.rec.f12||(lab==='Junk'?'Xin ngừng liên hệ':''))}"></div>
       <div class="full"><label class="t">11. Ghi chú</label><div class="opts">${['hỏi bản quốc tế','muốn học vị','Giới thiệu nội bộ'].map(v=>`<label><input type="checkbox" name="e11" value="${v}" ${C.flags[v]?'checked':''}> ${v}</label>`).join('')}</div><input type="text" id="e11b" placeholder="Ghi chú thêm" style="margin-top:6px"></div>
     </div>
-    ${z.length?`<h3>Tin nhắn gửi ngay</h3>${z.map(x=>{const k=keyOf(x[1]),tp=TXT(k,x[1]);SAYS.push(tp);return sayHTML(tp,x[0],SAYS.length-1,k)}).join('')}`:''}
+    <details class="zmsgs" ${zOpen?'open':''}><summary>💬 Tin nhắn Zalo để copy ngay (lời mời kết bạn · gửi thông tin)</summary>${z.map(x=>{const k=keyOf(x[1]),tp=TXT(k,x[1]);SAYS.push(tp);return sayHTML(tp,x[0],SAYS.length-1,k)}).join('')}</details>
     <div class="bar" style="margin-top:18px">
       <button class="btn primary" id="saveNext">💾 Lưu & gọi khách tiếp theo</button>
       <button class="btn" id="saveList">Lưu & về danh sách</button>
@@ -1745,10 +1750,11 @@ function renderSum(){
       <td style="font-size:12.5px;max-width:260px">${esc(r?r.f3:'')}</td>
       <td><button class="btn sm" data-call="${c.id}">📞</button></td></tr>`}).join('');
   const zrows=zalo.map(x=>{const c=x.c,r=x.last; let tplBtn='<span class="note">—</span>';
-    if(x.tpl){const tp=TXT(x.tk,x.tpl); const [,plain]=fillFor(c,tp,r?recTopic(r):null,r?r.f9:''); SAYI.push(plain); tplBtn=`<button class="btn sm" data-sumcp="${SAYI.length-1}">Copy tin nhắn</button>`}
+    { const [,inv]=fillFor(c,TXT('T.zInv',T.zInv),null,''); SAYI.push(inv); tplBtn=`<button class="btn sm" data-sumcp="${SAYI.length-1}" title="Dán vào lời mời kết bạn Zalo">① Copy lời mời kết bạn</button>`; }
+    if(x.tpl){const tp=TXT(x.tk,x.tpl); const [,plain]=fillFor(c,tp,r?recTopic(r):null,r?r.f9:''); SAYI.push(plain); tplBtn+=`<button class="btn sm" data-sumcp="${SAYI.length-1}" style="margin-top:5px">② Copy tin nhắn thông tin</button>`}
     const z=c.zl||{}; const zc=(k,l)=>`<td class="zcell ${z[k]?'ok':''}"><label title="${l}"><input type="checkbox" data-zl="${c.id}|${k}" ${z[k]?'checked':''}></label></td>`;
     return `<tr><td class="who" data-open="${c.id}" style="cursor:pointer"><b>${esc(c.name)}${lvTag(c)}</b><small>${esc(c.org||'')}</small><div class="note" style="font-size:11.5px;margin-top:3px">${esc(x.why)}</div></td>
-      <td style="white-space:nowrap"><b>${esc(c.phone||'chưa có SĐT')}</b> ${c.phone?`<button class="btn sm" data-copy="${esc(c.phone)}">Copy</button>`:''}<div style="margin-top:6px">${tplBtn}</div></td>
+      <td style="white-space:nowrap"><b>${esc(c.phone||'chưa có SĐT')}</b> ${c.phone?`<button class="btn sm" data-copy="${esc(c.phone)}">Copy</button>`:''}<div style="margin-top:6px;display:flex;flex-direction:column;align-items:flex-start">${tplBtn}</div></td>
       ${zc('inv','Gửi lời mời kết bạn')}${zc('acc','Đồng ý kết bạn')}${zc('sent','Gửi thông tin chương trình')}${zc('care','Đang chăm sóc')}
       <td><textarea class="zfb" data-zfb="${c.id}" placeholder="Khách phản hồi gì…">${esc(z.fb||'')}</textarea></td></tr>`}).join('');
   const mrows=mail.map(x=>{const c=x.c,r=x.last, em=r.email||c.email||'';
