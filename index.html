@@ -59,7 +59,7 @@ header{position:sticky;top:0;z-index:30;background:var(--dark);color:#fff;displa
 .chip.on{background:var(--green);border-color:var(--green);color:#fff}
 
 /* ---------- layout ---------- */
-.wrap{display:grid;grid-template-columns:230px minmax(0,1fr) 310px;gap:20px;padding:20px 18px 60px;max-width:1500px;margin:0 auto}
+.wrap{display:grid;grid-template-columns:210px minmax(0,1fr);gap:20px;padding:20px 18px 60px;max-width:1500px;margin:0 auto}
 nav{position:sticky;top:130px;align-self:start;display:flex;flex-direction:column;gap:3px}
 nav button{display:flex;gap:10px;align-items:center;border:0;background:none;text-align:left;padding:9px 11px;border-radius:9px;cursor:pointer;font-weight:500;color:#2a3550}
 nav button .n{flex:none;width:24px;height:24px;border-radius:7px;background:#e7e3d8;display:grid;place-items:center;font-size:11.5px;font-weight:700;color:#56607a}
@@ -208,6 +208,60 @@ body.editing .edbar{display:flex}
 .chip.lvchip.on{background:var(--dark);border-color:var(--dark)}
 .fbreak{flex-basis:100%;height:0}
 .flabel{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-right:2px}
+/* ===== v6: app + dock + tổng kết ===== */
+.app{display:grid;grid-template-columns:minmax(0,1fr) 370px;align-items:start}
+.appmain{min-width:0}
+.dock{position:sticky;top:65px;height:calc(100vh - 65px);overflow:hidden;padding:14px 16px 14px 0;display:flex;flex-direction:column;gap:10px}
+.dk{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(11,31,68,.05);flex:1 1 0;min-height:0;display:flex;flex-direction:column}
+.dk.closed{flex:none}
+.dk>.dh{flex:none}
+.dk .db{overflow:auto;min-height:0;flex:1}
+.dk>.dh{width:100%;display:flex;align-items:center;gap:8px;border:0;background:var(--dark);color:#fff;padding:10px 14px;font-weight:800;font-size:13.5px;cursor:pointer;text-align:left}
+.dk>.dh .n{background:var(--green-l);color:var(--dark);border-radius:6px;width:22px;height:22px;display:grid;place-items:center;font-size:12px;flex:none}
+.dk>.dh::after{content:"▾";margin-left:auto;color:var(--green-l)}
+.dk.closed>.dh::after{content:"▸"}
+.dk.closed .db{display:none}
+.db{padding:12px 14px;font-size:13px;line-height:1.5}
+.tp{border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-bottom:8px}
+.tp.on{border-color:var(--green-l);background:#fffaf0;box-shadow:0 0 0 2px #f3e3b5}
+.tp .hp{font-size:11px;color:var(--gold);font-weight:800;text-transform:uppercase;letter-spacing:.03em}
+.tp h5{margin:1px 0 5px;font-size:14px;color:var(--dark)}
+.tp dl{margin:0;display:grid;grid-template-columns:64px 1fr;gap:4px 8px}
+.tp dt{color:var(--muted);font-weight:700;font-size:11.5px}
+.tp dd{margin:0}
+table.fee{width:100%;background:none;border:0;border-radius:0;font-size:13px}
+table.fee td{padding:5px 0;border-bottom:1px dashed var(--line);background:none}
+table.fee td:last-child{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+table.fee tr.tot td{border-bottom:0;font-size:15.5px;color:var(--dark)}
+table.fee tr.tot td:last-child{color:#0b1f44;background:#f6e7bd;border-radius:6px;padding:4px 8px}
+.feeh{font-size:11.5px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:.04em;margin:4px 0 2px}
+.calc{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:6px 0;font-size:13px}
+.calc input{width:54px;border:1px solid var(--line);border-radius:7px;padding:4px 6px;text-align:center;font-weight:700}
+.calc b{color:var(--dark)}
+.dnote{position:relative;background:#f8f6f1;border-radius:8px;padding:8px 10px;font-size:12.5px;color:#444;margin-top:6px}
+.dnote.edited{background:#fff5df}
+.dnote .ed{position:static;margin-top:6px}
+.intro p{margin:0 0 8px}
+.intro ul{margin:0 0 8px;padding-left:18px}
+.intro li{margin:2px 0}
+.below{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:14px;margin-top:14px;align-items:start}
+.stepper div{cursor:pointer;transition:.15s}
+.stepper div:hover{color:var(--dark);border-color:var(--gold-l)}
+.ob.endo{grid-column:1/-1;border-style:dashed;border-color:#9fb0d4;background:#f4f6fb;color:#13306b}
+.sumcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-bottom:16px}
+.sc{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.sc b{display:block;font-size:24px;color:var(--dark);line-height:1.2}
+.sc span{font-size:12px;color:var(--muted);font-weight:600}
+.sumsec{margin-top:24px}
+.sumsec h2 .cnt{background:var(--dark);color:#fff;border-radius:999px;font-size:12px;padding:1px 9px}
+.inter{font-size:12.5px;line-height:1.45}
+.inter div{white-space:nowrap}
+.donechk{display:flex;align-items:center;gap:6px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
+tr.done td{opacity:.55}
+.lvtag{border-radius:6px;font-size:11px;font-weight:800;padding:1px 7px;margin-left:6px;display:inline-block;vertical-align:1px}
+#sdate{border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-weight:700;background:#fff}
+@media (max-width:1100px){.app{grid-template-columns:minmax(0,1fr)}.dock{position:static;height:auto;overflow:visible;padding:0 12px 40px}.dk{flex:none}.dk .db{overflow:visible}}
+@media (max-width:900px){.below{grid-template-columns:minmax(0,1fr)}}
 /* list */
 .lhead{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;margin-bottom:14px}
 .lhead h1{margin:0}
@@ -232,7 +286,7 @@ body.editing .edbar{display:flex}
 .modal textarea{min-height:170px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px}
 
 /* call */
-.callgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:20px;max-width:1400px;margin:0 auto;padding:18px 18px 70px}
+.callgrid{display:grid;grid-template-columns:minmax(0,1fr);gap:20px;max-width:1150px;margin:0 auto;padding:18px 18px 70px}
 .custbar{display:flex;flex-wrap:wrap;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 16px;margin-bottom:12px}
 .avatar{width:44px;height:44px;border-radius:50%;background:var(--dark);color:var(--green-l);display:grid;place-items:center;font-weight:800;font-size:18px;flex:none}
 .cinfo b{font-size:17px;display:block}
@@ -305,6 +359,7 @@ body.editing .edbar{display:flex}
   <div class="topnav">
     <button data-view="v-list">👥 Danh sách khách</button>
     <button data-view="v-call" id="navcall" style="display:none">📞 Đang gọi</button>
+    <button data-view="v-sum">📊 Tổng kết</button>
     <button data-view="v-ref">📖 Tra cứu kịch bản</button>
   </div>
   <div class="search">
@@ -325,6 +380,7 @@ body.editing .edbar{display:flex}
   <button class="btn sm primary" id="edDone">Xong</button>
 </div>
 
+<div class="app"><div class="appmain">
 <!-- ================= DANH SÁCH KHÁCH ================= -->
 <div class="view" id="v-list"><div class="pad">
   <div class="lhead">
@@ -347,29 +403,32 @@ body.editing .edbar{display:flex}
       <div class="stepper" id="stepper"></div>
       <div class="stepcard" id="card"></div>
     </div>
-    <div class="side">
-      <div class="box">
-        <h4>Khách nói gì — ghi nguyên văn</h4>
-        <textarea id="cnote" placeholder="Gõ nhanh trong lúc nghe… (tự đưa vào phiếu ghi nhận)"></textarea>
-      </div>
-      <div class="box">
-        <h4>Khách hỏi / phản đối giữa chừng</h4>
-        <input class="f" id="accq" placeholder="Lọc nhanh… (vd: hoc phi, ssbm)">
-        <div id="accs"></div>
-      </div>
-      <div class="box">
-        <h4>Tra nhanh</h4>
-        <div class="facts">
-          <div><span>Khai giảng</span><b>28/11/2026</b> · học trực tiếp</div>
-          <div><span>Học phí — chỉ nói khi khách hỏi</span><div class="price"><s>39tr</s>→<s>30tr</s>→<span class="final">25tr</span></div></div>
-          <div><span>Thời lượng</span>15 buổi · 45 giờ · 5 học phần</div>
-          <div><span>Địa điểm</span>Tầng 5, 116–118 Nguyễn Thị Minh Khai, P. Xuân Hoà</div>
-          <div><span>Hotline Viện</span>078 868 8686</div>
+      <div class="below side">
+        <div class="box">
+          <h4>Khách nói gì — ghi nguyên văn</h4>
+          <textarea id="cnote" placeholder="Gõ nhanh trong lúc nghe… (tự đưa vào phiếu ghi nhận)"></textarea>
+        </div>
+        <div class="box">
+          <h4>Khách hỏi / phản đối giữa chừng</h4>
+          <input class="f" id="accq" placeholder="Lọc nhanh… (vd: hoc phi, ssbm)">
+          <div id="accs"></div>
         </div>
       </div>
-    </div>
   </div>
 </div>
+
+<!-- ================= TỔNG KẾT ================= -->
+<div class="view" id="v-sum"><div class="pad">
+  <div class="lhead">
+    <div><h1>Tổng kết theo ngày</h1><div class="note" id="ssum"></div></div>
+    <div class="sp"></div>
+    <div class="scope" id="sscope"></div>
+    <input type="date" id="sdate">
+    <button class="btn" id="stoday">Hôm nay</button>
+    <button class="btn" id="scopy">Copy tổng kết</button>
+  </div>
+  <div id="sumwrap"></div>
+</div></div>
 
 <!-- ================= TRA CỨU ================= -->
 <div class="view" id="v-ref">
@@ -612,33 +671,13 @@ body.editing .edbar{display:flex}
 
 
 </main>
-<aside>
-  <div class="box">
-    <h4>Tra nhanh</h4>
-    <div class="facts">
-      <div><span>Khai giảng</span><b>28/11/2026</b> · học trực tiếp</div>
-      <div><span>Học phí — chỉ nói khi khách hỏi</span><div class="price"><s>39tr</s>→<s>30tr</s>→<span class="final">25tr</span></div></div>
-      <div><span>Thời lượng</span>15 buổi · 45 giờ · 5 học phần</div>
-      <div><span>Địa điểm</span>Tầng 5, 116–118 Nguyễn Thị Minh Khai, P. Xuân Hoà</div>
-      <div><span>Hạn học bổng</span>Hết tháng 11/2026</div>
-      <div><span>Hotline Viện</span>078 868 8686</div>
-      <div><span>Cộng đồng Zalo</span><button class="btn sm" data-copy="https://zalo.me/g/dftmrv998">Copy link nhóm</button></div>
-    </div>
-  </div>
-  <div class="box">
-    <h4>Không làm</h4>
-    <ul class="dont">
-      <li>Không nhắc chuyện khách vắng mặt</li>
-      <li>Không kể nội dung hội thảo khi khách không hỏi</li>
-      <li>Không giới thiệu khoá khi chưa nghe nhu cầu</li>
-      <li>Không báo giá khi khách chưa hỏi</li>
-      <li>Không so sánh, nhận xét về SSBM</li>
-      <li>Khách bảo dừng → dừng ngay</li>
-    </ul>
-  </div>
-</aside>
+
 </div>
 </div>
+
+</div><!-- /appmain -->
+<div class="dock" id="dock"></div>
+</div><!-- /app -->
 
 <!-- ================= MODALS ================= -->
 <div class="overlay" id="mImport"><div class="modal">
@@ -1021,6 +1060,7 @@ function showView(id){
   $$('.topnav button').forEach(b=>b.classList.toggle('on',b.dataset.view===id));
   if(id==='v-list') renderList();
   if(id==='v-ref') renderRefSay();
+  if(id==='v-sum') renderSum();
   window.scrollTo({top:0});
 }
 document.addEventListener('click',e=>{const b=e.target.closest('[data-view]'); if(b) showView(b.dataset.view)});
@@ -1203,7 +1243,7 @@ $('#btnCsv').onclick=()=>{
 function nowStr(){return new Date().toLocaleString('vi-VN',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'})}
 function missed(id){
   const c=CUS.find(x=>x.id===id); if(!c) return;
-  c.missed=(c.missed||0)+1; c.calls=c.calls||[]; c.calls.push({time:nowStr(),miss:true,caller:ME});
+  c.missed=(c.missed||0)+1; c.calls=c.calls||[]; c.calls.push({time:nowStr(),ts:new Date().toISOString(),miss:true,caller:ME});
   if(c.missed>=2) c.status='UND';
   saveCus();
   if(C && C.cid===id) endCallState();
@@ -1267,13 +1307,19 @@ function renderStepper(st){
   $('#stepper').innerHTML=STEPS.map((s,i)=>{
     const done = C.node==='end' ? i<6 : (st>=0 ? i<st : false);
     const cur = C.node==='end' ? i===6 : i===st;
-    return `<div class="${done?'done':''} ${cur?'cur':''}">${i+1}. ${s}</div>`}).join('');
+    return `<div class="${done?'done':''} ${cur?'cur':''}" data-step="${i}" title="Đi tới bước ${i+1}">${i+1}. ${s}</div>`}).join('');
 }
+const STEPNODE=['open','kyyeu','detai','hocphan','hb','zalo','end'];
+$('#stepper').addEventListener('click',e=>{const d=e.target.closest('[data-step]'); if(!d||!C) return; const to=STEPNODE[+d.dataset.step]; if(to===C.node) return;
+  C.hist.push({node:C.node,topic:C.topic}); C.node=to; C.visited.add(to); renderCard(); window.scrollTo({top:0,behavior:'smooth'});});
+const ENDOPT={l:'Kết thúc cuộc gọi → đánh giá xếp loại',k:'endo',ic:'🏁',to:'end'};
 function renderCard(){
   if(!C) return; SAYS=[];
   if(C.node==='end'){renderStepper(6);renderEnd();return}
   const n=N[C.node]; renderStepper(n.st);
-  const opts=typeof n.opts==='function'?n.opts():n.opts;
+  const base=typeof n.opts==='function'?n.opts():n.opts;
+  const opts=base.some(o=>o.to==='end')?base:[...base,ENDOPT];
+  renderDock();
   $('#card').innerHTML=`<div class="cardnav">${C.hist.length?'<button class="btn sm" id="back">← Quay lại</button>':'<span></span>'}<span class="note">${C.node==='hocphan'&&topic()?'Đề tài: <b>'+esc(topic().chip)+'</b>':''}</span></div>
     ${n.branch?`<span class="branch ${n.red?'red':''}">${esc(n.branch)}</span>`:''}
     <h1>${esc(n.title)}</h1>
@@ -1348,7 +1394,7 @@ function renderEnd(){
 }
 function collect(lab){
   const rv=n=>{const i=$(`#card input[name=${n}]:checked`);return i?i.value:''};
-  return {time:nowStr(), dur:durStr(), caller:ME, f1:C.rec.f1, f2:lab, f3:$('#e3').value.trim(), f4:$('#e4').value.trim(), f5:$('#e5').value.trim(), f6:$('#e6').value.trim(),
+  return {time:nowStr(), ts:new Date().toISOString(), topic:C.topic, dur:durStr(), caller:ME, f1:C.rec.f1, f2:lab, f3:$('#e3').value.trim(), f4:$('#e4').value.trim(), f5:$('#e5').value.trim(), f6:$('#e6').value.trim(),
     f7:rv('e7'), email:$('#eEmail').value.trim(), f8:rv('e8'), f9:$('#e9').value.trim()||'chưa hẹn', f10:$('#e10').value.trim(),
     f11:[...$$('#card input[name=e11]:checked').map(i=>i.value),$('#e11b').value.trim()].filter(Boolean).join('; '), f12:$('#e12').value.trim(), path:[...C.visited].join('>')};
 }
@@ -1455,7 +1501,7 @@ document.addEventListener('keydown',e=>{if(e.key==='/'&&!/INPUT|TEXTAREA|SELECT/
 
 
 /* ---------- giao diện sửa ---------- */
-function rerenderAll(){ if(typeof renderRefSay==='function') renderRefSay(); if(C){renderCard(); renderAcc();} }
+function rerenderAll(){ if(typeof renderRefSay==='function') renderRefSay(); renderDock(); if(C){renderCard(); renderAcc();} if($('#v-sum').classList.contains('on')) renderSum(); }
 function setEdit(on){ EDIT=on&&!!USER; document.body.classList.toggle('editing',EDIT); $('#edbtn').classList.toggle('on',EDIT);
   $('#edwho').innerHTML = USER?`— bản sửa của <b>${esc(USER)}</b> (${Object.keys(EDITS).length} câu đã sửa)`:''; rerenderAll(); }
 $('#edbtn').onclick=()=>setEdit(!EDIT);
@@ -1492,6 +1538,155 @@ $('#edImport').onclick=()=>{
       saveEdits(); $('#mMsg').classList.remove('on'); setEdit(true); toast(`Đã nhập ${n} câu`); }
     catch(e){ $('#impcmsg').textContent='Mã không đúng — kiểm tra lại.' } };
 };
+
+/* ================== 3 KHUNG THÔNG TIN LUÔN HIỂN THỊ ================== */
+const COURSE={
+  cl:{hp:'Học phần 02',name:'Quản trị chuyên môn & vận hành đội ngũ y khoa',
+      nd:'Vai trò người phụ trách chuyên môn; chuẩn hoá quy trình khám, kê đơn, bàn giao, chuyển tuyến; đo lường an toàn, chất lượng, trải nghiệm người bệnh.',
+      cc:'Bộ SOP chuẩn hoá · Dashboard quản trị chuyên môn · Kế hoạch cải tiến 60–90 ngày',
+      gv:'TS.BS. Lê Bình Phương — GĐ Quốc gia VN của AACI (Hoa Kỳ), chuyên gia quản trị chất lượng & an toàn người bệnh · BS.CK2 Võ Đăng Sơn — Phó GĐ Chuyên môn BV Quốc tế Nam Sài Gòn'},
+  tt:{hp:'Học phần 05',name:'Quản trị rủi ro trong hoạt động phòng khám / cơ sở y tế',
+      nd:'Rủi ro pháp lý (giấy phép, chứng chỉ, quảng cáo, hồ sơ bệnh án); rủi ro tài chính, thuế; thanh tra, kiểm tra. Thực hành 1 buổi mô phỏng đoàn thanh tra kiểm tra tại lớp.',
+      cc:'Hệ thống tuân thủ nội bộ · Checklist tiếp đoàn · Bộ chỉ số tài chính theo dõi',
+      gv:'Giảng viên Trường Cán bộ Thanh tra (Thanh tra Chính phủ) — module đồng xây dựng và giảng dạy'},
+  mk:{hp:'Học phần 03',name:'Truyền thông Marketing & Bán hàng cho ngành y tế',
+      nd:'Hành trình khách hàng từ biết đến, tin tưởng, tư vấn, chốt, quay lại; nội dung đa nền tảng; quảng cáo Facebook/TikTok an toàn; tư vấn online và telesales.',
+      cc:'Phễu doanh thu thực tế · Dashboard marketing · Script tư vấn và xử lý phản đối',
+      gv:'TS. Nguyễn Sinh Mỹ — Group COO Tập đoàn Drip Care Global, 20+ năm điều hành; chuyên gia quản trị, marketing & vận hành dịch vụ y tế'},
+  ns:{hp:'Học phần 01',name:'Quản trị nhân sự trong ngành y tế',
+      nd:'Chiến lược nhân sự cho phòng khám; đánh giá hiệu quả, KPI và đãi ngộ cho bác sĩ, điều dưỡng, kỹ thuật viên; thu hút và giữ chân nhân tài.',
+      cc:'Sơ đồ tổ chức · Thư viện KPI nhân sự · Bản tái cấu trúc nhân sự phòng/khoa',
+      gv:'TS. Nông Vương Phi — chuyên gia quản trị nhân sự healthcare · ThS. Trương Sĩ Thị Lài — GĐ Nhân sự UIP'},
+  cs:{hp:'Học phần 04',name:'Quản trị chiến lược cho ngành y tế',
+      nd:'Phân tích PESTEL, 5 Forces, SWOT; chọn chiến lược khác biệt hoá hay tăng trưởng; OKR, Balanced Scorecard; nhân rộng mô hình phòng khám.',
+      cc:'Strategic roadmap 6–12 tháng · Balanced Scorecard · Mô hình nhân rộng chuỗi',
+      gv:'TS. Nguyễn Sinh Mỹ — Group COO Drip Care Global'},
+};
+const CHIP={cl:'Chất lượng phòng khám',tt:'Tuân thủ – phòng ngừa rủi ro',mk:'Marketing phòng khám',ns:'Nhân sự',cs:'Chiến lược / nhân rộng'};
+KEYDEF.set('P.group','Có ưu đãi thêm khi đăng ký học theo nhóm từ 3 học viên trở lên (kịch bản: cơ sở có từ 3 đến 4 thành viên cùng đăng ký sẽ nhận mức ưu đãi tốt hơn). Mức cụ thể chưa có trong kịch bản — hẹn chuyên viên báo.');
+let DOCK=LS.get('iseed_dock',{}), GRPN=3;
+const VND=n=>n.toLocaleString('vi-VN')+' đ';
+function tpHTML(id){const t=COURSE[id], on=C&&C.topic===id;
+  return `<div class="tp ${on?'on':''}"><div class="hp">${t.hp} · ${esc(CHIP[id])}${on?' · khách đang chọn':''}</div><h5>${esc(t.name)}</h5>
+  <dl><dt>Nội dung</dt><dd>${esc(t.nd)}</dd><dt>Bộ công cụ</dt><dd>${esc(t.cc)}</dd><dt>Giảng dạy</dt><dd>${esc(t.gv)}</dd></dl></div>`}
+function renderDock(){
+  const d=$('#dock'); if(!d) return;
+  const g=TXT('P.group',KEYDEF.get('P.group')), ged='P.group' in EDITS;
+  const card=(k,n,title,body)=>`<div class="dk ${DOCK[k]?'closed':''}" data-dk="${k}"><button class="dh"><span class="n">${n}</span>${title}</button><div class="db">${body}</div></div>`;
+  d.innerHTML =
+   card('cd',1,'3 chuyên đề trọng tâm',
+     ['tt','cl','mk'].map(tpHTML).join('')+
+     `<details><summary class="note" style="cursor:pointer;margin:0">2 học phần còn lại (Nhân sự · Chiến lược)</summary><div style="margin-top:8px">${['ns','cs'].map(tpHTML).join('')}</div></details>
+      <p class="note" style="font-size:11.5px;margin:6px 0 0">Giảng viên ghép theo chuyên môn trong brochure; phân công từng buổi chưa chốt.</p>`)+
+   card('hp',2,'Học phí sau học bổng',
+     `<div class="feeh">Cá nhân</div>
+      <table class="fee"><tr><td>Học phí trọn gói</td><td><s>39.000.000 đ</s></td></tr>
+      <tr><td>Ưu đãi nhập học sớm</td><td><s>30.000.000 đ</s></td></tr>
+      <tr><td>Học bổng Quản trị Tuân thủ Y tế</td><td>− 5.000.000 đ</td></tr>
+      <tr class="tot"><td>Thực đóng / người</td><td>25.000.000 đ</td></tr></table>
+      <div class="feeh" style="margin-top:10px">Nhóm (từ 3 học viên)</div>
+      <div class="calc">Số người <input type="number" min="1" max="50" id="grpn" value="${GRPN}"> × 25.000.000 = <b id="grpt">${VND(GRPN*25e6)}</b></div>
+      <div class="note" style="font-size:11.5px;margin:0">(tổng theo mức cá nhân, chưa trừ ưu đãi nhóm)</div>
+      <div class="dnote ${ged?'edited':''}">${esc(g)}${EDIT&&USER?`<br><button class="btn sm ed" data-edk="P.group">Sửa</button>`:''}</div>
+      <p class="note" style="font-size:12px;margin:8px 0 0">Áp dụng đến hết tháng 11 · bản nội địa · tặng bộ Marketing KPI mẫu cho phòng khám. <b>Chỉ báo giá khi khách hỏi.</b></p>`)+
+   card('gt',3,'Giới thiệu Viện iSEED & khoá học',
+     `<div class="intro"><p><b>Viện Phát triển Giáo dục và Quản trị Bền vững (iSEED)</b> — tổ chức khoa học và công nghệ trực thuộc Liên hiệp các Hội Khoa học và Kỹ thuật Việt Nam (VUSTA). Nghiên cứu, đào tạo, tư vấn và chuyển giao tri thức về giáo dục, quản trị, phát triển nhân lực, chuyển đổi số và phát triển bền vững.</p>
+      <p><b>Mini MBA in Healthcare Service Management</b> — Quản trị Kinh doanh chuyên ngành Dịch vụ Y tế, đồng xây dựng cùng <b>Trường Cán bộ Thanh tra</b>. Học thuật Thụy Sĩ – Quản trị Mỹ – Insight thực chiến – Pháp lý Việt Nam.</p>
+      <ul><li>15 buổi · 45+ giờ · 5 môn, học trực tiếp · khai giảng <b>28/11/2026</b></li>
+      <li>Case study, workshop, mentor đồng hành, tư vấn 1:1; đồ án trên chính cơ sở của học viên (50% điểm)</li>
+      <li>Chứng nhận hoàn thành do iSEED & Trường Cán bộ Thanh tra đồng cấp (không phải văn bằng Thạc sĩ)</li>
+      <li>Dành cho: chủ phòng khám/nha khoa/thẩm mỹ, CEO/Founder, COO, quản lý cơ sở/chi nhánh, bác sĩ – điều dưỡng lên lãnh đạo, nhà đầu tư y tế</li></ul>
+      <p class="note" style="margin:0">Tầng 5, 116–118 Nguyễn Thị Minh Khai, P. Xuân Hoà, TP.HCM · 078 868 8686 · hub@iseed.edu.vn · iseed.edu.vn</p>
+      <div class="bar" style="margin-top:8px"><button class="btn sm" data-copy="https://zalo.me/g/dftmrv998">Copy link cộng đồng Zalo</button></div></div>`);
+}
+$('#dock').addEventListener('click',e=>{const h=e.target.closest('.dh'); if(!h) return; const k=h.parentElement.dataset.dk; DOCK[k]=!DOCK[k]; LS.set('iseed_dock',DOCK); h.parentElement.classList.toggle('closed',!!DOCK[k]);});
+$('#dock').addEventListener('input',e=>{if(e.target.id==='grpn'){GRPN=Math.max(0,+e.target.value||0); $('#grpt').textContent=VND(GRPN*25e6);}});
+
+/* ================== TỔNG KẾT THEO NGÀY ================== */
+const pad2=n=>String(n).padStart(2,'0');
+const dkey=d=>`${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+function recDate(r){
+  if(r.ts) return dkey(new Date(r.ts));
+  const t=String(r.time||''); const m=t.match(/(\d{1,2})\/(\d{1,2})/); if(!m) return '';
+  return `${new Date().getFullYear()}-${pad2(+m[2])}-${pad2(+m[1])}`;
+}
+function recTime(r){ if(r.ts){const d=new Date(r.ts);return pad2(d.getHours())+':'+pad2(d.getMinutes())} const m=String(r.time||'').match(/(\d{1,2}):(\d{2})/); return m?pad2(+m[1])+':'+m[2]:''; }
+function recTopic(r){ if(r.topic) return r.topic; const t=TOPICS.find(t=>r.f5&&r.f5.includes('Học phần '+t.hpNo)); return t?t.id:null; }
+const origIdx=c=>c.sid?parseInt(c.sid.slice(1),10):100000+CUS.indexOf(c);
+function fillFor(c,tpl,topicId,hen){const prev=C; C={cid:c.id,sal:c.sal||'anh/chị',topic:topicId,rec:{f9:hen||''}}; const out=[fill(tpl,true),fill(tpl,false)]; C=prev; return out;}
+let SDATE=dkey(new Date()), SSCOPE='mine';
+$('#sdate').value=SDATE;
+$('#sdate').onchange=e=>{SDATE=e.target.value||dkey(new Date());renderSum()};
+$('#stoday').onclick=()=>{SDATE=dkey(new Date());$('#sdate').value=SDATE;renderSum()};
+$('#sscope').addEventListener('click',e=>{const b=e.target.closest('[data-ss]'); if(b){SSCOPE=b.dataset.ss;renderSum()}});
+let SUMROWS=[];
+function dayData(){
+  return CUS.filter(c=>SSCOPE==='all'||!c.owner||c.owner===USER).map(c=>{
+    const t=(c.calls||[]).filter(r=>recDate(r)===SDATE); if(!t.length) return null;
+    const real=t.filter(r=>!r.miss); return {c,t,last:real[real.length-1]||null,miss:t.filter(r=>r.miss).length};
+  }).filter(Boolean).sort((a,b)=>origIdx(a.c)-origIdx(b.c));
+}
+function lvTag(c){const v=lvl(c);return `<span class="lvtag lv-${v}">${LVNAME[v]}</span>`}
+function renderSum(){
+  $('#sscope').innerHTML=`<button data-ss="mine" class="${SSCOPE==='mine'?'on':''}">${esc(USER||'Của tôi')}</button><button data-ss="all" class="${SSCOPE==='all'?'on':''}">Cả nhóm</button>`;
+  const D=dayData(); SUMROWS=D; const [y,m,d]=SDATE.split('-');
+  const isToday=SDATE===dkey(new Date());
+  $('#ssum').innerHTML=`${isToday?'<b>Hôm nay</b> · ':''}${d}/${m}/${y} · ${SSCOPE==='mine'?esc(USER):'Cả nhóm'} · sắp theo thứ tự file data gốc`;
+  if(!D.length){$('#sumwrap').innerHTML=`<div class="empty-state"><h2>Chưa có tương tác nào trong ngày ${d}/${m}/${y}</h2><p class="note">Các cuộc gọi đã lưu và lần bấm “Không bắt máy” sẽ hiện ở đây theo ngày.</p></div>`;return}
+  const cnt=l=>D.filter(x=>x.last&&x.last.f2===l).length;
+  const answered=D.filter(x=>x.last).length;
+  const card=(n,l)=>`<div class="sc"><b>${n}</b><span>${l}</span></div>`;
+  const zalo=[], mail=[];
+  D.forEach(x=>{
+    const r=x.last, c=x.c;
+    if(r&&r.f7==='Email') mail.push(x);
+    if(r&&r.f7==='Zalo') zalo.push({...x,why:'Đã đồng ý kết bạn — gửi thông tin chương trình & học bổng',tpl:T.zNow,tk:'T.zNow'});
+    else if(r&&String(r.path||'').includes('busy')) zalo.push({...x,why:`Khách bận — nhắn thông tin qua Zalo, gọi lại: ${r.f9||'chưa hẹn'}`,tpl:recTopic(r)?T.zNow:null,tk:'T.zNow'});
+    else if(!r&&(c.missed||0)>=2) zalo.push({...x,why:'2 lần không bắt máy — nhắn Zalo theo mẫu',tpl:T.zMiss,tk:'T.zMiss'});
+  });
+  const done=(c,k)=>!!(c.done&&c.done[SDATE+':'+k]);
+  const chk=(c,k)=>`<label class="donechk"><input type="checkbox" data-done="${c.id}|${k}" ${done(c,k)?'checked':''}> Đã ${k==='zalo'?'nhắn':'gửi'}</label>`;
+  let SAYI=[];
+  const rows=D.map((x,i)=>{const c=x.c,r=x.last;
+    const inter=x.t.map(t=>`<div>${recTime(t)} · ${t.miss?'📵 Không bắt máy':`<b>${esc(t.f2||'')}</b>${t.dur?` (${esc(t.dur)})`:''}`}</div>`).join('');
+    return `<tr><td class="note">${c.sid?origIdx(c)+1:'—'}</td>
+      <td class="who"><b>${esc(c.name)}${lvTag(c)}</b><small>${esc([c.title,c.org].filter(Boolean).join(' · '))}</small>${SSCOPE==='all'&&c.owner?`<div class="own">👤 ${esc(c.owner)}</div>`:''}</td>
+      <td style="white-space:nowrap;font-variant-numeric:tabular-nums">${esc(c.phone||'')}</td>
+      <td class="inter">${inter}</td>
+      <td><span class="badge ${c.status.replace(' ','')}">${esc(c.status)}</span></td>
+      <td style="font-size:13px">${esc(r?r.f4:'')}</td>
+      <td style="font-size:13px">${esc(r?r.f7:'')}${r&&r.f9&&r.f9!=='chưa hẹn'?`<br>🗓️ ${esc(r.f9)}`:''}</td>
+      <td style="font-size:12.5px;max-width:260px">${esc(r?r.f3:'')}</td>
+      <td><button class="btn sm" data-call="${c.id}">📞</button></td></tr>`}).join('');
+  const zrows=zalo.map(x=>{const c=x.c,r=x.last; let tplBtn='<span class="note">—</span>';
+    if(x.tpl){const tp=TXT(x.tk,x.tpl); const [,plain]=fillFor(c,tp,r?recTopic(r):null,r?r.f9:''); SAYI.push(plain); tplBtn=`<button class="btn sm" data-sumcp="${SAYI.length-1}">Copy tin nhắn</button>`}
+    return `<tr class="${done(c,'zalo')?'done':''}"><td class="who"><b>${esc(c.name)}${lvTag(c)}</b><small>${esc(c.org||'')}</small></td>
+      <td style="white-space:nowrap"><b>${esc(c.phone||'chưa có SĐT')}</b> ${c.phone?`<button class="btn sm" data-copy="${esc(c.phone)}">Copy</button>`:''}</td>
+      <td style="font-size:13px">${esc(x.why)}${r?`<br><span class="note">Đề tài: ${esc(r.f4||'—')} · Tài liệu: ${esc(r.f8||'chưa ghi')}</span>`:''}</td>
+      <td>${tplBtn}</td><td>${chk(c,'zalo')}</td></tr>`}).join('');
+  const mrows=mail.map(x=>{const c=x.c,r=x.last, em=r.email||c.email||'';
+    return `<tr class="${done(c,'mail')?'done':''}"><td class="who"><b>${esc(c.name)}${lvTag(c)}</b><small>${esc(c.org||'')}</small></td>
+      <td style="white-space:nowrap">${em?`<b>${esc(em)}</b> <button class="btn sm" data-copy="${esc(em)}">Copy</button>`:'<span class="note">chưa có email</span>'}</td>
+      <td style="font-size:13px">${esc(r.f4||'—')}<br><span class="note">${esc(r.f5||'')}</span></td>
+      <td style="font-size:13px">${esc(r.f8||'chưa ghi')}</td><td>${chk(c,'mail')}</td></tr>`}).join('');
+  $('#sumwrap').innerHTML=`<div class="sumcards">${card(D.length,'Khách đã tương tác')}${card(answered,'Nghe máy')}${card(D.filter(x=>!x.last).length,'Chỉ không bắt máy')}${card(cnt('MQL'),'MQL')}${card(cnt('MQL Nur'),'MQL Nur')}${card(cnt('UND'),'UND')}${card(cnt('Junk'),'Junk')}</div>
+    <div class="card" style="padding:0;overflow:auto"><table class="ctable" style="border:0"><thead><tr><th>STT gốc</th><th>Khách</th><th>SĐT</th><th>Tương tác trong ngày</th><th>Nhãn</th><th>Đề tài</th><th>Kênh · hẹn</th><th>Căn cứ</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="sumsec"><h2>💬 Khách cần tương tác qua Zalo <span class="cnt">${zalo.length}</span></h2>
+      ${zalo.length?`<div class="card" style="padding:0;overflow:auto"><table style="border:0"><thead><tr><th>Khách</th><th>SĐT Zalo</th><th>Việc cần làm</th><th>Tin nhắn mẫu</th><th></th></tr></thead><tbody>${zrows}</tbody></table></div>`:'<p class="note">Không có khách nào cần nhắn Zalo trong ngày này.</p>'}</div>
+    <div class="sumsec"><h2>📧 Khách cần gửi tài liệu qua Mail <span class="cnt">${mail.length}</span></h2>
+      ${mail.length?`<div class="card" style="padding:0;overflow:auto"><table style="border:0"><thead><tr><th>Khách</th><th>Email</th><th>Đề tài / học phần</th><th>Tài liệu</th><th></th></tr></thead><tbody>${mrows}</tbody></table></div>`:'<p class="note">Không có khách nào cần gửi mail trong ngày này.</p>'}</div>`;
+  $('#sumwrap')._says=SAYI;
+}
+$('#sumwrap').addEventListener('click',e=>{
+  const c=e.target.closest('[data-call]'); if(c){startCall(c.dataset.call);return}
+  const s=e.target.closest('[data-sumcp]'); if(s){copy($('#sumwrap')._says[+s.dataset.sumcp]);}
+});
+$('#sumwrap').addEventListener('change',e=>{const k=e.target.dataset.done; if(!k) return; const [id,t]=k.split('|'); const c=CUS.find(x=>x.id===id); if(!c) return;
+  c.done=c.done||{}; if(e.target.checked) c.done[SDATE+':'+t]=true; else delete c.done[SDATE+':'+t]; saveCus(); e.target.closest('tr').classList.toggle('done',e.target.checked);});
+$('#scopy').onclick=()=>{const cl=v=>String(v??'').replace(/[\t\n\r]+/g,' ');
+  const head=['STT gốc','Owner','Họ tên','Cấp','SĐT','Email','Tương tác trong ngày','Nhãn','Đề tài','Kênh','Hẹn','Đã gửi tài liệu','Căn cứ'];
+  copy([head.join('\t'),...SUMROWS.map(x=>{const c=x.c,r=x.last||{};return [c.sid?origIdx(c)+1:'',c.owner,c.name,LVNAME[lvl(c)],c.phone,r.email||c.email,x.t.map(t=>recTime(t)+' '+(t.miss?'Không bắt máy':t.f2)).join('; '),c.status,r.f4,r.f7,r.f9,r.f8,r.f3].map(cl).join('\t')})].join('\n'));};
+
 /* ================== KHỞI ĐỘNG ================== */
 tabs[1].classList.add('on');
 applyUser();

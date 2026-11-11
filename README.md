@@ -6,6 +6,8 @@ Nội dung bám theo kịch bản telesale phiên bản 09/11/2026 của Viện 
 ## Tính năng
 - **Danh sách khách**: dán từ MS Lists / Excel (kèm dòng tiêu đề) hoặc chọn file .xlsx/.csv. Lọc theo nhãn, tìm theo tên/SĐT.
 - **Cấp chức vụ**: tự phân loại Cấp cao / Quản lý / Chuyên môn y / Nhân viên / Sinh viên / Chưa rõ theo chức danh; lọc trước khi gọi, bấm vào nhãn cấp để sửa nếu sai.
+- **Tổng kết theo ngày** 📊: danh sách khách đã tương tác (theo thứ tự file data gốc), kèm mục Khách cần nhắn Zalo và Khách cần gửi Mail.
+- **3 khung luôn hiển thị** bên phải: 3 chuyên đề trọng tâm · Học phí sau học bổng (cá nhân/nhóm) · Giới thiệu Viện iSEED & khoá học.
 - **Gọi từng bước**: bấm 📞 Gọi → mỗi bước hiện lời thoại + các nút "Khách phản hồi thế nào?" (quan tâm → bước tiếp; bận → hẹn giờ; không quan tâm → dừng ngay).
 - **Tự điền** xưng hô, tên khách, tên người gọi, học phần, câu USP và 2 công cụ theo đề tài khách chọn.
 - **Ghi nhận cuối cuộc gọi**: nhãn gợi ý theo mục 9, phiếu 12 mục, tin nhắn Zalo mẫu, "Lưu & gọi khách tiếp theo".
