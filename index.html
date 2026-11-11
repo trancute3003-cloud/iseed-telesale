@@ -330,6 +330,8 @@ td.zcell.ok{background:#e9f6ee}
 .zmsgs summary{cursor:pointer;font-weight:800;color:var(--dark);font-size:14px}
 .ccount{margin-top:6px;font-size:12px;font-weight:700;color:#2e7d32}
 .ccount.over{color:var(--red)}
+.zinfo{font-size:12.5px;margin-top:4px;line-height:1.4;color:#33405c}
+.zinfo .zl{font-weight:700;color:var(--gold)}
 /* list */
 .lhead{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;margin-bottom:14px}
 .lhead h1{margin:0}
@@ -1759,7 +1761,8 @@ function renderSum(){
     { const [,inv]=fillFor(c,TXT('T.zInv',T.zInv),null,''); SAYI.push(inv); tplBtn=`<button class="btn sm" data-sumcp="${SAYI.length-1}" title="Dán vào lời mời kết bạn Zalo">① Copy lời mời kết bạn</button>`; }
     if(x.tpl){const tp=TXT(x.tk,x.tpl); const [,plain]=fillFor(c,tp,r?recTopic(r):null,r?r.f9:''); SAYI.push(plain); tplBtn+=`<button class="btn sm" data-sumcp="${SAYI.length-1}" style="margin-top:5px">② Copy tin nhắn thông tin</button>`}
     const z=c.zl||{}; const zc=(k,l)=>`<td class="zcell ${z[k]?'ok':''}"><label title="${l}"><input type="checkbox" data-zl="${c.id}|${k}" ${z[k]?'checked':''}></label></td>`;
-    return `<tr><td class="who" data-open="${c.id}" style="cursor:pointer"><b>${esc(c.name)}${lvTag(c)}</b><small>${esc(c.org||'')}</small><div class="note" style="font-size:11.5px;margin-top:3px">${esc(x.why)}</div></td>
+    return `<tr><td class="who" data-open="${c.id}" style="cursor:pointer"><b>${esc(c.name)}${lvTag(c)}</b><small>${esc(c.org||'')}</small>${(()=>{const tid=r?recTopic(r):null; const tp=tid?CHIP[tid]:(r&&r.f4?r.f4:''); const notes=[r&&r.f3, r&&r.f11, c.memo].filter(v=>v&&String(v).trim());
+      return (tp?`<div class="zinfo"><span class="zl">🎯 Chuyên đề:</span> ${esc(tp)}</div>`:'')+(notes.length?`<div class="zinfo"><span class="zl">📝 Ghi chú:</span> ${notes.map(esc).join(' · ')}</div>`:'')+(r&&r.f9&&r.f9!=='chưa hẹn'?`<div class="zinfo"><span class="zl">🗓️ Hẹn:</span> ${esc(r.f9)}</div>`:'');})()}</td>
       <td style="white-space:nowrap"><b>${esc(c.phone||'chưa có SĐT')}</b> ${c.phone?`<button class="btn sm" data-copy="${esc(c.phone)}">Copy</button>`:''}<div style="margin-top:6px;display:flex;flex-direction:column;align-items:flex-start">${tplBtn}</div></td>
       ${zc('inv','Gửi lời mời kết bạn')}${zc('acc','Đồng ý kết bạn')}${zc('sent','Gửi thông tin chương trình')}${zc('care','Đang chăm sóc')}
       <td><textarea class="zfb" data-zfb="${c.id}" placeholder="Khách phản hồi gì…">${esc(z.fb||'')}</textarea></td></tr>`}).join('');
