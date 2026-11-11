@@ -475,6 +475,7 @@ tr.done td{opacity:.55}
     <div class="scope" id="sscope"></div>
     <input type="date" id="sdate">
     <button class="btn" id="stoday">Hôm nay</button>
+    <button class="btn" id="sall">Tất cả các ngày</button>
     <button class="btn" id="scopy">Copy tổng kết</button>
   </div>
   <div id="sumwrap"></div>
@@ -1083,6 +1084,11 @@ document.addEventListener('change',e=>{ const s=e.target.closest('[data-lvid]');
 let CUS = LS.get('iseed_customers',[]);
 CUS = CUS.filter(c=>!/^Khách mẫu /.test(c.name||'')); // bỏ khách mẫu của bản thử
 CUS.forEach(c=>{ if(c.status==='Chưa gọi' && (c.missed||0)>0) c.status='UND'; });
+function parseOldTime(t){ t=String(t||''); const dm=t.match(/(\d{1,2})[\/\-.](\d{1,2})(?:[\/\-.](\d{2,4}))?/); if(!dm) return null;
+  const hm=t.match(/(\d{1,2}):(\d{2})/); const y=dm[3]?(dm[3].length===2?2000+ +dm[3]:+dm[3]):new Date().getFullYear();
+  const d=new Date(y,+dm[2]-1,+dm[1],hm?+hm[1]:12,hm?+hm[2]:0); return isNaN(d)?null:d; }
+let MIG=0; CUS.forEach(c=>(c.calls||[]).forEach(r=>{ if(!r.ts){ const d=parseOldTime(r.time); if(d){ r.ts=d.toISOString(); MIG++; } } }));
+if(MIG) try{localStorage.setItem('iseed_customers',JSON.stringify(CUS))}catch(e){}
 const saveCus = ()=>LS.set('iseed_customers',CUS);
 let C = null; // cuộc gọi hiện tại
 const curCus = ()=>C && CUS.find(c=>c.id===C.cid);
@@ -1665,22 +1671,22 @@ const pad2=n=>String(n).padStart(2,'0');
 const dkey=d=>`${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
 function recDate(r){
   if(r.ts) return dkey(new Date(r.ts));
-  const t=String(r.time||''); const m=t.match(/(\d{1,2})\/(\d{1,2})/); if(!m) return '';
-  return `${new Date().getFullYear()}-${pad2(+m[2])}-${pad2(+m[1])}`;
+  const d=parseOldTime(r.time); return d?dkey(d):'';
 }
 function recTime(r){ if(r.ts){const d=new Date(r.ts);return pad2(d.getHours())+':'+pad2(d.getMinutes())} const m=String(r.time||'').match(/(\d{1,2}):(\d{2})/); return m?pad2(+m[1])+':'+m[2]:''; }
 function recTopic(r){ if(r.topic) return r.topic; const t=TOPICS.find(t=>r.f5&&r.f5.includes('Học phần '+t.hpNo)); return t?t.id:null; }
 const origIdx=c=>c.sid?parseInt(c.sid.slice(1),10):100000+CUS.indexOf(c);
 function fillFor(c,tpl,topicId,hen){const prev=C; C={cid:c.id,sal:c.sal||'anh/chị',topic:topicId,rec:{f9:hen||''}}; const out=[fill(tpl,true),fill(tpl,false)]; C=prev; return out;}
-let SDATE=dkey(new Date()), SSCOPE='mine';
+let SDATE=dkey(new Date()), SSCOPE='mine', SALL=false;
 $('#sdate').value=SDATE;
-$('#sdate').onchange=e=>{SDATE=e.target.value||dkey(new Date());renderSum()};
-$('#stoday').onclick=()=>{SDATE=dkey(new Date());$('#sdate').value=SDATE;renderSum()};
+$('#sdate').onchange=e=>{SDATE=e.target.value||dkey(new Date());SALL=false;renderSum()};
+$('#sall').onclick=()=>{SALL=!SALL;renderSum()};
+$('#stoday').onclick=()=>{SDATE=dkey(new Date());$('#sdate').value=SDATE;SALL=false;renderSum()};
 $('#sscope').addEventListener('click',e=>{const b=e.target.closest('[data-ss]'); if(b){SSCOPE=b.dataset.ss;renderSum()}});
 let SUMROWS=[];
 function dayData(){
   return CUS.filter(c=>SSCOPE==='all'||!c.owner||c.owner===USER).map(c=>{
-    const t=(c.calls||[]).filter(r=>recDate(r)===SDATE); if(!t.length) return null;
+    const t=(c.calls||[]).filter(r=>SALL||recDate(r)===SDATE); if(!t.length) return null;
     const real=t.filter(r=>!r.miss); return {c,t,last:real[real.length-1]||null,miss:t.filter(r=>r.miss).length};
   }).filter(Boolean).sort((a,b)=>origIdx(a.c)-origIdx(b.c));
 }
@@ -1689,8 +1695,9 @@ function renderSum(){
   $('#sscope').innerHTML=`<button data-ss="mine" class="${SSCOPE==='mine'?'on':''}">${esc(USER||'Của tôi')}</button><button data-ss="all" class="${SSCOPE==='all'?'on':''}">Cả nhóm</button>`;
   const D=dayData(); SUMROWS=D; const [y,m,d]=SDATE.split('-');
   const isToday=SDATE===dkey(new Date());
-  $('#ssum').innerHTML=`${isToday?'<b>Hôm nay</b> · ':''}${d}/${m}/${y} · ${SSCOPE==='mine'?esc(USER):'Cả nhóm'} · sắp theo thứ tự file data gốc`;
-  if(!D.length){$('#sumwrap').innerHTML=`<div class="empty-state"><h2>Chưa có tương tác nào trong ngày ${d}/${m}/${y}</h2><p class="note">Các cuộc gọi đã lưu và lần bấm “Không bắt máy” sẽ hiện ở đây theo ngày.</p></div>`;return}
+  $('#sall').classList.toggle('primary',SALL); $('#sdate').style.opacity=SALL?.45:1;
+  $('#ssum').innerHTML=SALL?`<b>Tất cả các ngày</b> · ${SSCOPE==='mine'?esc(USER):'Cả nhóm'} · sắp theo thứ tự file data gốc`:`${isToday?'<b>Hôm nay</b> · ':''}${d}/${m}/${y} · ${SSCOPE==='mine'?esc(USER):'Cả nhóm'} · sắp theo thứ tự file data gốc`;
+  if(!D.length){$('#sumwrap').innerHTML=`<div class="empty-state"><h2>Chưa có tương tác nào ${SALL?'':'trong ngày '+d+'/'+m+'/'+y}</h2><p class="note">Các cuộc gọi đã lưu và lần bấm “Không bắt máy” sẽ hiện ở đây theo ngày.</p></div>`;return}
   const cnt=l=>D.filter(x=>x.last&&x.last.f2===l).length;
   const answered=D.filter(x=>x.last).length;
   const card=(n,l)=>`<div class="sc"><b>${n}</b><span>${l}</span></div>`;
@@ -1702,11 +1709,12 @@ function renderSum(){
     else if(r&&String(r.path||'').includes('busy')) zalo.push({...x,why:`Khách bận — nhắn thông tin qua Zalo, gọi lại: ${r.f9||'chưa hẹn'}`,tpl:recTopic(r)?T.zNow:null,tk:'T.zNow'});
     else if(!r&&(c.missed||0)>=2) zalo.push({...x,why:'2 lần không bắt máy — nhắn Zalo theo mẫu',tpl:T.zMiss,tk:'T.zMiss'});
   });
-  const done=(c,k)=>!!(c.done&&c.done[SDATE+':'+k]);
+  const dayOf=c=>SALL?recDate((c.calls||[]).slice(-1)[0]||{}):SDATE;
+  const done=(c,k)=>!!(c.done&&c.done[dayOf(c)+':'+k]);
   const chk=(c,k)=>`<label class="donechk"><input type="checkbox" data-done="${c.id}|${k}" ${done(c,k)?'checked':''}> Đã ${k==='zalo'?'nhắn':'gửi'}</label>`;
   let SAYI=[];
   const rows=D.map((x,i)=>{const c=x.c,r=x.last;
-    const inter=x.t.map(t=>`<div>${recTime(t)} · ${t.miss?'📵 Không bắt máy':`<b>${esc(t.f2||'')}</b>${t.dur?` (${esc(t.dur)})`:''}`}</div>`).join('');
+    const inter=x.t.map(t=>`<div>${SALL?esc(recDate(t).slice(8,10)+'/'+recDate(t).slice(5,7))+' ':''}${recTime(t)} · ${t.miss?'📵 Không bắt máy':`<b>${esc(t.f2||'')}</b>${t.dur?` (${esc(t.dur)})`:''}`}</div>`).join('');
     return `<tr><td class="note">${c.sid?origIdx(c)+1:'—'}</td>
       <td class="who" data-open="${c.id}" style="cursor:pointer" title="Xem phiếu khách"><b>${esc(c.name)}${lvTag(c)}</b><small>${esc([c.title,c.org].filter(Boolean).join(' · '))}</small>${SSCOPE==='all'&&c.owner?`<div class="own">👤 ${esc(c.owner)}</div>`:''}</td>
       <td style="white-space:nowrap;font-variant-numeric:tabular-nums">${esc(c.phone||'')}</td>
@@ -1741,7 +1749,7 @@ $('#sumwrap').addEventListener('click',e=>{
   const s=e.target.closest('[data-sumcp]'); if(s){copy($('#sumwrap')._says[+s.dataset.sumcp]);}
 });
 $('#sumwrap').addEventListener('change',e=>{const k=e.target.dataset.done; if(!k) return; const [id,t]=k.split('|'); const c=CUS.find(x=>x.id===id); if(!c) return;
-  c.done=c.done||{}; if(e.target.checked) c.done[SDATE+':'+t]=true; else delete c.done[SDATE+':'+t]; saveCus(); e.target.closest('tr').classList.toggle('done',e.target.checked);});
+  const dk=SALL?recDate((c.calls||[]).slice(-1)[0]||{}):SDATE; c.done=c.done||{}; if(e.target.checked) c.done[dk+':'+t]=true; else delete c.done[dk+':'+t]; saveCus(); e.target.closest('tr').classList.toggle('done',e.target.checked);});
 $('#scopy').onclick=()=>{const cl=v=>String(v??'').replace(/[\t\n\r]+/g,' ');
   const head=['STT gốc','Owner','Họ tên','Cấp','SĐT','Email','Tương tác trong ngày','Nhãn','Đề tài','Kênh','Hẹn','Đã gửi tài liệu','Căn cứ'];
   copy([head.join('\t'),...SUMROWS.map(x=>{const c=x.c,r=x.last||{};return [c.sid?origIdx(c)+1:'',c.owner,c.name,LVNAME[lvl(c)],c.phone,r.email||c.email,x.t.map(t=>recTime(t)+' '+(t.miss?'Không bắt máy':t.f2)).join('; '),c.status,r.f4,r.f7,r.f9,r.f8,r.f3].map(cl).join('\t')})].join('\n'));};
