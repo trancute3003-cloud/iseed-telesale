@@ -320,6 +320,12 @@ tr.done td{opacity:.55}
 textarea.zfb{min-height:84px;min-width:180px;font-size:13px}
 tr.done td{opacity:1}
 tr.done td:first-child b{text-decoration:none}
+.zgrp{text-align:center!important;border-bottom:1px solid var(--line)!important;background:#ece7da!important}
+th.zh{text-align:center!important;width:92px;font-size:11px!important;line-height:1.3;vertical-align:middle!important}
+td.zcell{text-align:center;vertical-align:middle!important;border-left:1px solid var(--line)}
+td.zcell label{display:flex;justify-content:center;align-items:center;cursor:pointer;padding:8px}
+td.zcell input{width:20px;height:20px;cursor:pointer;accent-color:#2e9b4f}
+td.zcell.ok{background:#e9f6ee}
 /* list */
 .lhead{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;margin-bottom:14px}
 .lhead h1{margin:0}
@@ -1740,10 +1746,10 @@ function renderSum(){
       <td><button class="btn sm" data-call="${c.id}">📞</button></td></tr>`}).join('');
   const zrows=zalo.map(x=>{const c=x.c,r=x.last; let tplBtn='<span class="note">—</span>';
     if(x.tpl){const tp=TXT(x.tk,x.tpl); const [,plain]=fillFor(c,tp,r?recTopic(r):null,r?r.f9:''); SAYI.push(plain); tplBtn=`<button class="btn sm" data-sumcp="${SAYI.length-1}">Copy tin nhắn</button>`}
-    const z=c.zl||{}; const zc=(k,l)=>`<label class="zstep ${z[k]?'ok':''}"><input type="checkbox" data-zl="${c.id}|${k}" ${z[k]?'checked':''}> ${l}</label>`;
-    return `<tr class="${z.inv&&z.acc&&z.sent?'done':''}"><td class="who" data-open="${c.id}" style="cursor:pointer"><b>${esc(c.name)}${lvTag(c)}</b><small>${esc(c.org||'')}</small><div class="note" style="font-size:11.5px;margin-top:3px">${esc(x.why)}</div></td>
+    const z=c.zl||{}; const zc=(k,l)=>`<td class="zcell ${z[k]?'ok':''}"><label title="${l}"><input type="checkbox" data-zl="${c.id}|${k}" ${z[k]?'checked':''}></label></td>`;
+    return `<tr><td class="who" data-open="${c.id}" style="cursor:pointer"><b>${esc(c.name)}${lvTag(c)}</b><small>${esc(c.org||'')}</small><div class="note" style="font-size:11.5px;margin-top:3px">${esc(x.why)}</div></td>
       <td style="white-space:nowrap"><b>${esc(c.phone||'chưa có SĐT')}</b> ${c.phone?`<button class="btn sm" data-copy="${esc(c.phone)}">Copy</button>`:''}<div style="margin-top:6px">${tplBtn}</div></td>
-      <td><div class="zsteps">${zc('inv','Gửi lời mời kết bạn')}${zc('acc','Đồng ý kết bạn')}${zc('sent','Gửi thông tin chương trình (Thư ngỏ & Brochure)')}</div></td>
+      ${zc('inv','Gửi lời mời kết bạn')}${zc('acc','Đồng ý kết bạn')}${zc('sent','Gửi thông tin chương trình')}${zc('care','Đang chăm sóc')}
       <td><textarea class="zfb" data-zfb="${c.id}" placeholder="Khách phản hồi gì…">${esc(z.fb||'')}</textarea></td></tr>`}).join('');
   const mrows=mail.map(x=>{const c=x.c,r=x.last, em=r.email||c.email||'';
     const ml=c.ml||{};
@@ -1754,7 +1760,8 @@ function renderSum(){
   $('#sumwrap').innerHTML=`<div class="sumcards">${card(D.length,'Khách đã tương tác')}${card(answered,'Nghe máy')}${card(D.filter(x=>!x.last).length,'Chỉ không bắt máy')}${card(cnt('MQL'),'MQL')}${card(cnt('MQL Nur'),'MQL Nur')}${card(cnt('UND'),'UND')}${card(cnt('Junk'),'Junk')}</div>
     <div class="card" style="padding:0;overflow:auto"><table class="ctable" style="border:0"><thead><tr><th>STT gốc</th><th>Khách</th><th>SĐT</th><th>Tương tác trong ngày</th><th>Nhãn</th><th>Đề tài</th><th>Kênh · hẹn</th><th>Căn cứ</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
     <div class="sumsec"><h2>💬 Khách cần tương tác qua Zalo <span class="cnt">${zalo.length}</span></h2>
-      ${zalo.length?`<div class="card" style="padding:0;overflow:auto"><table style="border:0"><thead><tr><th>Khách</th><th>SĐT Zalo · tin nhắn</th><th>Việc cần làm</th><th>Phản hồi</th></tr></thead><tbody>${zrows}</tbody></table></div>`:'<p class="note">Không có khách nào cần nhắn Zalo trong ngày này.</p>'}</div>
+      ${zalo.length?`<div class="card" style="padding:0;overflow:auto"><table style="border:0"><thead><tr><th rowspan="2">Khách</th><th rowspan="2">SĐT Zalo · tin nhắn</th><th colspan="4" class="zgrp">Việc cần làm</th><th rowspan="2">Phản hồi</th></tr>
+<tr><th class="zh">Gửi lời mời kết bạn</th><th class="zh">Đồng ý kết bạn</th><th class="zh">Gửi thông tin chương trình</th><th class="zh">Đang chăm sóc</th></tr></thead><tbody>${zrows}</tbody></table></div>`:'<p class="note">Không có khách nào cần nhắn Zalo trong ngày này.</p>'}</div>
     <div class="sumsec"><h2>📧 Khách cần gửi tài liệu qua Mail <span class="cnt">${mail.length}</span></h2>
       ${mail.length?`<div class="card" style="padding:0;overflow:auto"><table style="border:0"><thead><tr><th>Khách</th><th>Email</th><th>Đề tài / học phần</th><th>Việc cần làm <span class="note" style="text-transform:none">(mail do chị Huyền gửi)</span></th></tr></thead><tbody>${mrows}</tbody></table></div>`:'<p class="note">Không có khách nào cần gửi mail trong ngày này.</p>'}</div>`;
   $('#sumwrap')._says=SAYI;
@@ -1767,7 +1774,7 @@ $('#sumwrap').addEventListener('click',e=>{
 });
 $('#sumwrap').addEventListener('change',e=>{
   const zk=e.target.dataset.zl; if(zk){const [id,k]=zk.split('|'); const c=CUS.find(x=>x.id===id); c.zl=c.zl||{}; c.zl[k]=e.target.checked; saveCus();
-    e.target.closest('label').classList.toggle('ok',e.target.checked); const z=c.zl; e.target.closest('tr').classList.toggle('done',!!(z.inv&&z.acc&&z.sent)); return}
+    e.target.closest('td').classList.toggle('ok',e.target.checked); return}
   const mk=e.target.dataset.ml; if(mk){const c=CUS.find(x=>x.id===mk); c.ml=c.ml||{}; c.ml.huyen=e.target.checked; saveCus();
     e.target.closest('label').classList.toggle('ok',e.target.checked); e.target.closest('tr').classList.toggle('done',e.target.checked); return}
   const k=e.target.dataset.done; if(!k) return; const [id,t]=k.split('|'); const c=CUS.find(x=>x.id===id); if(!c) return;
