@@ -1103,7 +1103,9 @@ FAQS.forEach((o,i)=>o.b.forEach((x,j)=>x[0]==='say'&&reg(x[1],'F.'+i+'.'+j)));
 TOPICS.forEach(t=>KEYDEF.set('U.'+t.id,t.usp));
 function keyOf(txt){const n=nz(txt); if(!KEYOF.has(n)){let h=7;for(const c of n)h=(h*31+c.charCodeAt(0))|0; reg(txt,'R.'+(h>>>0).toString(36))} return KEYOF.get(n)}
 let EDITS={}, EDIT=false;
-let BASE_EDITS = {}; // bản gốc chung của nhóm (đồng bộ từ bản sửa của Chen)
+// Bản gốc chung của nhóm = bản sửa của Chen (11/11/2026)
+const BAKED_BASE = {"T.nhip1": "Dạ em chào {kh} {ten}, em là {em} gọi từ Viện (iSEED) Phát triển Giáo dục và Quản trị bền vững - đơn vị tổ chức hội thảo về Quản trị tuân thủ và phòng ngừa rủi ro pháp lý trong lĩnh vực y tế, phòng khám được diễn ra vào cuối tháng 10 vừa qua.", "T.nhip3": "Em xin phép hỏi nhanh {ten} một câu thôi có được không ạ? \nEm thấy {kh} đã đăng ký hội thảo. \n3 vấn đề đang được quan tâm: Quản trị chất lượng phòng khám // Quản trị tuân thủ, phòng ngừa rủi ro // Truyền thông marketing cho phòng khám.\nThì...Yếu tố nào sẽ mang lại nhiều giá trị cho cơ sở của mình ạ?", "T.hocphan": "Dạ vâng. Phần {kh} vừa nói cũng là vấn đề mà phần lớn các anh chị khác đang quan tâm nhiều nhất đấy ạ.\nĐơn vị bên em có chương trình đào tạo ngắn hạn dành cho lãnh đạo cơ sở y tế tư nhân, bao gồm chi tiết và chuyên sâu về học phần {hp} (trong chương trình Mini MBA in Healthcare Service Management)", "T.nhip2": "Sau hội thảo bên em có gửi tài liệu của các diễn giả qua email cho tất cả {kh} đã đăng ký rồi ạ.", "T.tools": "Mỗi học phần đều có bộ công cụ thực tiễn riêng. \nĐối với học phần {hp} - {tools}  là bộ công cụ {kh} có thể áp dụng ngay cho cơ sở của mình ạ.", "B.3.0": "Dạ chương trình do Viện iSEED và Trường Cán bộ Thanh tra đồng cấp chứng nhận hoàn thành ạ.", "T.hb": "Dạ nhân đây em xin phép thông tin thêm một việc ạ. Viện đang có chương trình Học bổng Quản trị Tuân thủ Y tế, dành cho các anh/chị đang làm việc trong lĩnh vực y tế, phòng khám — cộng thêm với học bổng ưu đãi nhập học sớm của khoá nên mức học phí rất ưu đãi ạ, tổng học phí sau khi áp dụng 2 học bổng trên còn 25 triệu. Khoá khai giảng ngày 28/11, và chính sách học bổng này áp dụng đến hết tháng 11 thôi ạ.", "T.zalo": "Em xin phép kết bạn Zalo với {kh} theo số máy này nhé ạ. Em sẽ gửi thêm cho {kh} chi tiết về khoá học và chính sách học bổng qua Zalo cho {kh} ạ. Hoặc em có thể gửi  qua email để {kh} tiện xem ạ.", "T.zaloKy": "Nếu {kh} chưa xem được email thì em gửi lại tài liệu liên quan qua đây (Zalo) luôn cho tiện ạ.", "T.busy": "Dạ em xin lỗi đã gọi không đúng lúc ạ. Em xin phép nhắn thông tin qua Zalo theo số máy này để {kh} xem khi tiện, và gọi lại sau ạ. Khoảng giờ nào trong tuần {kh} tiện nghe máy hơn ạ?", "O.o-thuky.0": "Dạ vâng ạ. Vậy em sẽ gửi tài liệu qua Zalo số này để {kh} tham khảo nhé. Bên mình quan tâm phần nào trong ba nội dung: chất lượng, tuân thủ – rủi ro, hay marketing ạ?", "O.o-gia.1": "Nếu cơ sở mình có từ 3 thành viên trở lên cùng đăng ký học sẽ nhận được mức ưu đãi tốt hơn ạ."};
+let BASE_EDITS = {...BAKED_BASE};
 const TXT=(key,def)=>{ if(!key) return def; if(Object.prototype.hasOwnProperty.call(EDITS,key)) return EDITS[key]; if(Object.prototype.hasOwnProperty.call(BASE_EDITS,key)) return BASE_EDITS[key]; return def; };
 function saveEdits(){try{localStorage.setItem('iseed_edits_'+USER,JSON.stringify(EDITS))}catch(e){}}
 /* ================== TIỆN ÍCH ================== */
@@ -1242,7 +1244,7 @@ $('#uok').onclick=async()=>{
   ME=$('#sayname').value.trim()||USERS[USER]; LS.set(meKey(USER),ME);
   $('#mUser').classList.remove('on'); applyUser(); SCOPE=isMgr()?'all':'mine'; SSCOPE=isMgr()?'all':'mine'; FILTER='all'; showView(isMgr()?'v-rep':'v-list'); pullSync(); pushSync();
 };
-function applyUser(){ $('#uname').textContent = USER || 'Chọn người dùng'; EDITS = USER?LS.get('iseed_edits_'+USER,{}):{}; BASE_EDITS=LS.get('iseed_base_edits',{}); $('#edbtn').style.display=(USER&&!isMgr())?'':'none'; document.body.classList.toggle('mgr',isMgr()); if(!USER||isMgr()) setEdit(false); $('#edBase').style.display=USER==='Chen'?'':'none'; rerenderAll(); }
+function applyUser(){ $('#uname').textContent = USER || 'Chọn người dùng'; EDITS = USER?LS.get('iseed_edits_'+USER,{}):{}; BASE_EDITS={...BAKED_BASE,...LS.get('iseed_base_edits',{})}; $('#edbtn').style.display=(USER&&!isMgr())?'':'none'; document.body.classList.toggle('mgr',isMgr()); if(!USER||isMgr()) setEdit(false); $('#edBase').style.display=USER==='Chen'?'':'none'; rerenderAll(); }
 $('#userbtn').onclick=openUser;
 
 
@@ -1948,7 +1950,7 @@ async function pullSync(){
     const r=await res.json(); if(!r.ok) throw new Error(r.error||'lỗi');
     let changed=false;
     (r.items||[]).forEach(it=>{
-      if(it.id==='__base_edits__'){ BASE_EDITS=(it.data&&it.data.edits)||{}; LS.set('iseed_base_edits',BASE_EDITS); return; }
+      if(it.id==='__base_edits__'){ const be=(it.data&&it.data.edits)||{}; LS.set('iseed_base_edits',be); BASE_EDITS={...BAKED_BASE,...be}; return; }
       const d=it.data; if(!d||!d.id) return;
       if(!isMgr() && d.owner===USER) return;            // khách của mình: máy mình là bản chuẩn
       const i=CUS.findIndex(c=>c.id===d.id);
