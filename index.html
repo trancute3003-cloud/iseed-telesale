@@ -351,6 +351,16 @@ td.zcell.ok{background:#e9f6ee}
 .brow .bt i{display:block;height:100%}
 .legend2{display:flex;gap:12px;font-size:12px;color:var(--muted);margin-top:6px}
 .legend2 i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+.mgr-only{display:none!important}
+body.mgr .mgr-only{display:inline-block!important}
+body.mgr .caller-only,body.mgr #dock{display:none!important}
+body.mgr .app{grid-template-columns:minmax(0,1fr)}
+body.mgr .search{display:none}
+body.mgr #sumwrap input{pointer-events:none}
+body.mgr #sumwrap textarea{pointer-events:none;background:#f8f6f1}
+body.mgr #sumwrap [data-call]{display:none}
+.ownb{display:inline-block;color:#fff;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:700;white-space:nowrap}
+td.ownc{vertical-align:middle}
 /* list */
 .lhead{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;margin-bottom:14px}
 .lhead h1{margin:0}
@@ -446,11 +456,11 @@ td.zcell.ok{background:#e9f6ee}
 <header>
   <img class="logo" src="logo.png" alt="iSEED — From Global to Local">
   <div class="topnav">
-    <button data-view="v-list">👥 Danh sách khách</button>
+    <button data-view="v-list" class="caller-only">👥 Danh sách khách</button>
     <button data-view="v-call" id="navcall" style="display:none">📞 Đang gọi</button>
-    <button data-view="v-rep">📈 Báo cáo</button>
+    <button data-view="v-rep" class="mgr-only">📈 Báo cáo</button>
     <button data-view="v-sum">📊 Tổng kết</button>
-    <button data-view="v-ref">📖 Tra cứu kịch bản</button>
+    <button data-view="v-ref" class="caller-only">📖 Tra cứu kịch bản</button>
   </div>
   <div class="search">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
@@ -1126,6 +1136,8 @@ const USERS = {'Chen':'Chen','Bảo Trân':'Trân','Chị Huyền':'Huyền'};
 const MANAGERS = ['Chị Huyền'];
 const CALLERS = ['Chen','Bảo Trân'];
 const isMgr = ()=>MANAGERS.includes(USER);
+const OWNCOL={'Chen':'#13306b','Bảo Trân':'#b8892b'};
+const ownCell=c=>c.owner?`<span class="ownb" style="background:${OWNCOL[c.owner]||'#666'}">👤 ${esc(c.owner)}</span>`:'<span class="note">—</span>';
 let USER = LS.get('iseed_user','');
 const meKey = u=>'iseed_me_'+u;
 let ME = USER ? LS.get(meKey(USER), USERS[USER]||USER) : '';
@@ -1180,6 +1192,8 @@ function fill(tpl, html){
 
 /* ================== VIEWS ================== */
 function showView(id){
+  if(isMgr() && (id==='v-list'||id==='v-ref'||id==='v-call')) id='v-rep';
+  if(!isMgr() && id==='v-rep') id='v-list';
   $$('.view').forEach(v=>v.classList.toggle('on',v.id===id));
   $$('.topnav button').forEach(b=>b.classList.toggle('on',b.dataset.view===id));
   if(id==='v-list') renderList();
@@ -1765,6 +1779,7 @@ function dayData(){
 }
 function lvTag(c){const v=lvl(c);return `<span class="lvtag lv-${v}">${LVNAME[v]}</span>`}
 function renderSum(){
+  const OC = isMgr()||SSCOPE==='all';
   $('#sscope').innerHTML=`<button data-ss="mine" class="${SSCOPE==='mine'?'on':''}">${esc(USER||'Của tôi')}</button><button data-ss="all" class="${SSCOPE==='all'?'on':''}">Cả nhóm</button>`;
   const D=dayData(); SUMROWS=D; const [y,m,d]=SDATE.split('-');
   const isToday=SDATE===dkey(new Date());
@@ -1789,7 +1804,8 @@ function renderSum(){
   const rows=D.map((x,i)=>{const c=x.c,r=x.last;
     const inter=x.t.map(t=>`<div>${SALL?esc(recDate(t).slice(8,10)+'/'+recDate(t).slice(5,7))+' ':''}${recTime(t)} · ${t.miss?'📵 Không bắt máy':`<b>${esc(t.f2||'')}</b>${t.dur?` (${esc(t.dur)})`:''}`}</div>`).join('');
     return `<tr><td class="note">${c.sid?origIdx(c)+1:'—'}</td>
-      <td class="who" data-open="${c.id}" style="cursor:pointer" title="Xem phiếu khách"><b>${esc(c.name)}${lvTag(c)}</b><small>${esc([c.title,c.org].filter(Boolean).join(' · '))}</small>${SSCOPE==='all'&&c.owner?`<div class="own">👤 ${esc(c.owner)}</div>`:''}</td>
+      <td class="who" data-open="${c.id}" style="cursor:pointer" title="Xem phiếu khách"><b>${esc(c.name)}${lvTag(c)}</b><small>${esc([c.title,c.org].filter(Boolean).join(' · '))}</small></td>
+      ${OC?`<td class="ownc">${ownCell(c)}</td>`:''}
       <td style="white-space:nowrap;font-variant-numeric:tabular-nums">${esc(c.phone||'')}</td>
       <td class="inter">${inter}</td>
       <td><span class="badge ${c.status.replace(' ','')}">${esc(c.status)}</span></td>
@@ -1803,22 +1819,24 @@ function renderSum(){
     const z=c.zl||{}; const zc=(k,l)=>`<td class="zcell ${z[k]?'ok':''}"><label title="${l}"><input type="checkbox" data-zl="${c.id}|${k}" ${z[k]?'checked':''}></label></td>`;
     return `<tr><td class="who" data-open="${c.id}" style="cursor:pointer"><b>${esc(c.name)}${lvTag(c)}</b><small>${esc(c.org||'')}</small>${(()=>{const tid=r?recTopic(r):null; const tp=tid?CHIP[tid]:(r&&r.f4?r.f4:''); const notes=[r&&r.f3, r&&r.f11, c.memo].filter(v=>v&&String(v).trim());
       return (tp?`<div class="zinfo"><span class="zl">🎯 Chuyên đề:</span> ${esc(tp)}</div>`:'')+(notes.length?`<div class="zinfo"><span class="zl">📝 Ghi chú:</span> ${notes.map(esc).join(' · ')}</div>`:'')+(r&&r.f9&&r.f9!=='chưa hẹn'?`<div class="zinfo"><span class="zl">🗓️ Hẹn:</span> ${esc(r.f9)}</div>`:'');})()}</td>
+      ${OC?`<td class="ownc">${ownCell(c)}</td>`:''}
       <td style="white-space:nowrap"><b>${esc(c.phone||'chưa có SĐT')}</b> ${c.phone?`<button class="btn sm" data-copy="${esc(c.phone)}">Copy</button>`:''}<div style="margin-top:6px;display:flex;flex-direction:column;align-items:flex-start">${tplBtn}</div></td>
       ${zc('inv','Gửi lời mời kết bạn')}${zc('acc','Đồng ý kết bạn')}${zc('sent','Gửi thông tin chương trình')}${zc('care','Đang chăm sóc')}
       <td><textarea class="zfb" data-zfb="${c.id}" placeholder="Khách phản hồi gì…">${esc(z.fb||'')}</textarea></td></tr>`}).join('');
   const mrows=mail.map(x=>{const c=x.c,r=x.last, em=r.email||c.email||'';
     const ml=c.ml||{};
     return `<tr class="${ml.huyen?'done':''}"><td class="who" data-open="${c.id}" style="cursor:pointer"><b>${esc(c.name)}${lvTag(c)}</b><small>${esc(c.org||'')}</small></td>
+      ${OC?`<td class="ownc">${ownCell(c)}</td>`:''}
       <td style="white-space:nowrap">${em?`<b>${esc(em)}</b> <button class="btn sm" data-copy="${esc(em)}">Copy</button>`:'<span class="note">chưa có email</span>'}</td>
       <td style="font-size:13px">${esc(r.f4||'—')}<br><span class="note">${esc(r.f5||'')}</span></td>
       <td><label class="zstep ${ml.huyen?'ok':''}"><input type="checkbox" data-ml="${c.id}" ${ml.huyen?'checked':''}> Thông tin đến chị Huyền</label></td></tr>`}).join('');
   $('#sumwrap').innerHTML=`<div class="sumcards">${card(D.length,'Khách đã tương tác')}${card(answered,'Nghe máy')}${card(D.filter(x=>!x.last).length,'Chỉ không bắt máy')}${card(cnt('MQL'),'MQL')}${card(cnt('MQL Nur'),'MQL Nur')}${card(cnt('UND'),'UND')}${card(cnt('Junk'),'Junk')}</div>
-    <div class="card" style="padding:0;overflow:auto"><table class="ctable" style="border:0"><thead><tr><th>STT gốc</th><th>Khách</th><th>SĐT</th><th>Tương tác trong ngày</th><th>Nhãn</th><th>Đề tài</th><th>Kênh · hẹn</th><th>Căn cứ</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="card" style="padding:0;overflow:auto"><table class="ctable" style="border:0"><thead><tr><th>STT gốc</th><th>Khách</th>${OC?'<th>Người phụ trách</th>':''}<th>SĐT</th><th>Tương tác trong ngày</th><th>Nhãn</th><th>Đề tài</th><th>Kênh · hẹn</th><th>Căn cứ</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
     <div class="sumsec"><h2>💬 Khách cần tương tác qua Zalo <span class="cnt">${zalo.length}</span></h2>
-      ${zalo.length?`<div class="card" style="padding:0;overflow:auto"><table style="border:0"><thead><tr><th rowspan="2">Khách</th><th rowspan="2">SĐT Zalo · tin nhắn</th><th colspan="4" class="zgrp">Việc cần làm</th><th rowspan="2">Phản hồi</th></tr>
+      ${zalo.length?`<div class="card" style="padding:0;overflow:auto"><table style="border:0"><thead><tr><th rowspan="2">Khách</th>${OC?'<th rowspan="2">Người phụ trách</th>':''}<th rowspan="2">SĐT Zalo · tin nhắn</th><th colspan="4" class="zgrp">Việc cần làm</th><th rowspan="2">Phản hồi</th></tr>
 <tr><th class="zh">Gửi lời mời kết bạn</th><th class="zh">Đồng ý kết bạn</th><th class="zh">Gửi thông tin chương trình</th><th class="zh">Đang chăm sóc</th></tr></thead><tbody>${zrows}</tbody></table></div>`:'<p class="note">Không có khách nào cần nhắn Zalo trong ngày này.</p>'}</div>
     <div class="sumsec"><h2>📧 Khách cần gửi tài liệu qua Mail <span class="cnt">${mail.length}</span></h2>
-      ${mail.length?`<div class="card" style="padding:0;overflow:auto"><table style="border:0"><thead><tr><th>Khách</th><th>Email</th><th>Đề tài / học phần</th><th>Việc cần làm <span class="note" style="text-transform:none">(mail do chị Huyền gửi)</span></th></tr></thead><tbody>${mrows}</tbody></table></div>`:'<p class="note">Không có khách nào cần gửi mail trong ngày này.</p>'}</div>`;
+      ${mail.length?`<div class="card" style="padding:0;overflow:auto"><table style="border:0"><thead><tr><th>Khách</th>${OC?'<th>Người phụ trách</th>':''}<th>Email</th><th>Đề tài / học phần</th><th>Việc cần làm <span class="note" style="text-transform:none">(mail do chị Huyền gửi)</span></th></tr></thead><tbody>${mrows}</tbody></table></div>`:'<p class="note">Không có khách nào cần gửi mail trong ngày này.</p>'}</div>`;
   $('#sumwrap')._says=SAYI;
 }
 $('#sumwrap').addEventListener('input',e=>{const id=e.target.dataset.zfb; if(!id) return; const c=CUS.find(x=>x.id===id); c.zl=c.zl||{}; c.zl.fb=e.target.value; clearTimeout(e.target._t); e.target._t=setTimeout(saveCus,400);});
@@ -1987,12 +2005,12 @@ function renderRep(){
   const mql=CUS.filter(c=>c.status==='MQL').sort((a,b)=>origIdx(a)-origIdx(b));
   const mqlRows=mql.map(c=>{const r=lastReal(c)||{}; const t=recTopic(r);
     return `<tr class="crow" data-open="${c.id}"><td class="who"><b>${esc(c.name)}${lvTag(c)}</b><small>${esc([c.title,c.org].filter(Boolean).join(' · '))}</small></td><td style="white-space:nowrap"><b>${esc(c.phone||'')}</b></td>
-      <td style="font-size:13px">${esc(t?CHIP[t]:(r.f4||'—'))}</td><td style="font-size:12.5px">${esc([r.f3,r.f11,c.memo].filter(Boolean).join(' · ')||'—')}</td><td style="font-size:13px">${esc(r.f7||'')}${c.hen?`<br>🗓️ ${esc(c.hen)}`:''}</td><td class="note">${esc(c.owner||'')}<br>${r.ts?esc(recDate(r).slice(8,10)+'/'+recDate(r).slice(5,7)):''}</td></tr>`}).join('');
+      <td style="font-size:13px">${esc(t?CHIP[t]:(r.f4||'—'))}</td><td style="font-size:12.5px">${esc([r.f3,r.f11,c.memo].filter(Boolean).join(' · ')||'—')}</td><td style="font-size:13px">${esc(r.f7||'')}${c.hen?`<br>🗓️ ${esc(c.hen)}`:''}</td><td>${ownCell(c)}<br><span class="note">${r.ts?esc(recDate(r).slice(8,10)+'/'+recDate(r).slice(5,7)):''}</span></td></tr>`}).join('');
   // Mail chị Huyền gửi
   const mail=CUS.filter(c=>{const r=lastReal(c); return r&&r.f7==='Email';}).sort((a,b)=>origIdx(a)-origIdx(b));
   const mailRows=mail.map(c=>{const r=lastReal(c); const em=r.email||c.email||''; const t=recTopic(r);
     return `<tr class="crow" data-open="${c.id}"><td class="who"><b>${esc(c.name)}${lvTag(c)}</b><small>${esc(c.org||'')}</small></td><td>${em?`<b>${esc(em)}</b> <button class="btn sm" data-copy="${esc(em)}">Copy</button>`:'<span class="note">chưa có</span>'}</td>
-      <td style="font-size:13px">${esc(t?CHIP[t]:(r.f4||'—'))}</td><td>${c.ml&&c.ml.huyen?'<span class="badge MQLNur">Đã báo chị Huyền</span>':'<span class="badge">Chưa báo</span>'}</td><td class="note">${esc(c.owner||'')}</td></tr>`}).join('');
+      <td style="font-size:13px">${esc(t?CHIP[t]:(r.f4||'—'))}</td><td>${c.ml&&c.ml.huyen?'<span class="badge MQLNur">Đã báo chị Huyền</span>':'<span class="badge">Chưa báo</span>'}</td><td>${ownCell(c)}</td></tr>`}).join('');
   const total=CUS.filter(c=>CALLERS.includes(c.owner)), done=total.filter(c=>c.status!=='Chưa gọi').length;
   $('#repwrap').innerHTML=`
     ${(!SYNC_URL()||!LS.get('iseed_tok',''))?`<div class="why" style="margin-top:0"><strong>Chưa kết nối đồng bộ</strong>Số liệu dưới đây mới chỉ là dữ liệu trên máy này. Khi đã cài Google Sheet (⚙️ Đồng bộ báo cáo trong nút 👤), báo cáo sẽ gồm kết quả của cả Chen và Trân.</div>`:''}
@@ -2004,9 +2022,9 @@ function renderRep(){
       <div class="rcard"><h3>🏷️ Cấp chức vụ đã gọi</h3><div class="bars">${lvBars}</div></div>
     </div>
     <div class="sumsec"><h2>⭐ Khách MQL — chị Huyền tư vấn chuyên sâu <span class="cnt">${mql.length}</span></h2>
-      ${mql.length?`<div class="card" style="padding:0;overflow:auto"><table class="ctable" style="border:0"><thead><tr><th>Khách</th><th>SĐT</th><th>Chuyên đề</th><th>Ghi chú từ cuộc gọi</th><th>Kênh · hẹn</th><th>Người gọi</th></tr></thead><tbody>${mqlRows}</tbody></table></div>`:'<p class="note">Chưa có khách MQL.</p>'}</div>
+      ${mql.length?`<div class="card" style="padding:0;overflow:auto"><table class="ctable" style="border:0"><thead><tr><th>Khách</th><th>SĐT</th><th>Chuyên đề</th><th>Ghi chú từ cuộc gọi</th><th>Kênh · hẹn</th><th>Người phụ trách</th></tr></thead><tbody>${mqlRows}</tbody></table></div>`:'<p class="note">Chưa có khách MQL.</p>'}</div>
     <div class="sumsec"><h2>📧 Khách cần chị Huyền gửi tài liệu qua Mail <span class="cnt">${mail.length}</span></h2>
-      ${mail.length?`<div class="card" style="padding:0;overflow:auto"><table class="ctable" style="border:0"><thead><tr><th>Khách</th><th>Email</th><th>Chuyên đề</th><th>Trạng thái</th><th>Người gọi</th></tr></thead><tbody>${mailRows}</tbody></table></div>`:'<p class="note">Chưa có khách cần gửi mail.</p>'}</div>
+      ${mail.length?`<div class="card" style="padding:0;overflow:auto"><table class="ctable" style="border:0"><thead><tr><th>Khách</th><th>Email</th><th>Chuyên đề</th><th>Trạng thái</th><th>Người phụ trách</th></tr></thead><tbody>${mailRows}</tbody></table></div>`:'<p class="note">Chưa có khách cần gửi mail.</p>'}</div>
     <p class="note" style="margin-top:18px">Bấm vào tên khách để xem phiếu đánh giá chi tiết. Xem danh sách từng ngày ở mục 📊 Tổng kết.</p>`;
 }
 $('#repwrap').addEventListener('click',e=>{ if(e.target.closest('button')) return; const o=e.target.closest('[data-open]'); if(o) openCus(o.dataset.open); });
