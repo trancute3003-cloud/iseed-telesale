@@ -35,14 +35,14 @@ Trong lời thoại, `{kh}` = xưng hô, `{ten}` = tên khách, `{em}` = tên ng
 - **Chen**, **Bảo Trân**: người gọi — mỗi người thấy khách của mình (cột Owner).
 - **Chị Huyền**: quản lý — mục 📈 Báo cáo (tiến độ từng người, lượt gọi 7 ngày, chuyên đề, khách MQL, khách cần gửi mail), xem Danh sách / Tổng kết / phiếu khách của cả nhóm (chỉ xem, không gọi).
 
-## Cài đồng bộ báo cáo (làm 1 lần, ~10 phút)
-1. Mở https://sheets.new → đặt tên **iSEED Telesale – Dữ liệu**.
-2. **Tiện ích mở rộng → Apps Script** → xoá code mẫu → dán toàn bộ file [`apps-script/Code.gs`](apps-script/Code.gs) → bấm 💾 Lưu.
-3. **Triển khai → Tuỳ chọn triển khai mới** → bánh răng ⚙️ chọn **Ứng dụng web**:
-   - *Thực thi dưới dạng*: **Tôi**
-   - *Người có quyền truy cập*: **Bất kỳ ai**
-   → **Triển khai** → **Cấp quyền truy cập** (chọn tài khoản Google → Nâng cao → Đi tới… → Cho phép).
-4. Copy **URL ứng dụng web** (dạng `https://script.google.com/macros/s/…/exec`).
-5. Trên web: bấm 👤 → **⚙️ Đồng bộ báo cáo** → dán link → nhập mật khẩu → Vào làm việc. (Hoặc gửi link cho Claude để gắn sẵn vào web cho cả nhóm.)
+## Lưu trữ chung (không cần Google Sheet)
+Kết quả gọi của mỗi người được **mã hoá bằng mật khẩu nhóm** rồi lưu vào nhánh `data` của repo này (nhánh riêng, không làm website build lại). Chị Huyền mở mục 📈 Báo cáo là thấy số liệu gộp của Chen và Trân; nút **⬇ Xuất Excel** tải file báo cáo khi cần.
 
-Dữ liệu chỉ đọc/ghi được khi có mật khẩu mở danh sách khách (Apps Script chỉ lưu mã băm của mật khẩu).
+Kết nối một lần cho cả nhóm:
+1. Tạo mã truy cập: https://github.com/settings/personal-access-tokens/new
+   - *Token name*: `iseed-telesale` · *Expiration*: chọn ngày hết hạn (ví dụ 1 năm)
+   - *Repository access*: **Only select repositories** → chọn **iseed-telesale**
+   - *Permissions → Repository permissions → Contents*: **Read and write**
+   - **Generate token** → copy mã (`github_pat_…`).
+2. Trên web: 👤 → **⚙️ Kết nối lưu trữ chung** → dán mã → nhập mật khẩu → Vào làm việc.
+   Mã được mã hoá bằng mật khẩu nhóm và lưu lên repo; máy của Trân và chị Huyền tự nhận khi nhập mật khẩu.

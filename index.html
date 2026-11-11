@@ -524,6 +524,7 @@ td.ownc{vertical-align:middle}
     <div><h1>Báo cáo tiến độ telesale</h1><div class="note" id="rsub"></div></div>
     <div class="sp"></div>
     <button class="btn" id="rrefresh">⟳ Làm mới số liệu</button>
+    <button class="btn primary" id="rexcel">⬇ Xuất Excel</button>
   </div>
   <div id="repwrap"></div>
 </div></div>
@@ -821,7 +822,9 @@ Trân trọng cảm ơn {Kh} và mong sớm nhận được phản hồi ạ.</d
   <div class="inl"><label>Tên xưng khi gọi (“em là …”)</label><input id="sayname"></div>
   <div class="inl" id="pwbox"><label>Mật khẩu mở danh sách khách</label><input type="password" id="pw" autocomplete="current-password">
     <p class="note" style="margin-top:6px">Danh sách 341 khách được mã hoá ngay trong website — người không có mật khẩu chỉ thấy chuỗi ký tự vô nghĩa. Mỗi máy chỉ cần nhập một lần.</p></div>
-  <details class="inl"><summary class="note" style="cursor:pointer;font-weight:700">⚙️ Đồng bộ báo cáo (Google Sheet)</summary><label style="margin-top:8px">Link Web App của Google Apps Script (…/exec)</label><input id="syncurl" placeholder="https://script.google.com/macros/s/…/exec"><p class="note" style="margin:6px 0 0">Chỉ cần nhập một lần trên mỗi máy. Đã có link thì Chen, Trân và chị Huyền dùng chung.</p></details>
+  <details class="inl" id="ghbox"><summary class="note" style="cursor:pointer;font-weight:700">⚙️ Kết nối lưu trữ chung (làm 1 lần cho cả nhóm)</summary>
+    <label style="margin-top:8px">Mã truy cập GitHub (fine-grained token, bắt đầu bằng <code>github_pat_</code>)</label><input id="ghtok" type="password" autocomplete="off" placeholder="github_pat_…">
+    <p class="note" style="margin:6px 0 0">Chỉ cần một người nhập <b>một lần</b>. Mã được mã hoá bằng mật khẩu nhóm rồi lưu vào GitHub, các máy khác tự nhận khi nhập mật khẩu.</p></details>
   <div class="bar" style="align-items:center"><button class="btn primary" id="uok">Vào làm việc →</button><span class="note" id="umsg"></span></div>
 </div></div>
 
@@ -1213,8 +1216,8 @@ function openUser(){
   pickU = USER || '';
   $('#ubig').innerHTML = Object.keys(USERS).map(u=>`<button data-user="${u}" class="${u===pickU?'on':''}">${u}<small>${MANAGERS.includes(u)?'Quản lý · xem báo cáo':ENC.by[u]+' khách'}</small></button>`).join('');
   $('#sayname').value = pickU ? LS.get(meKey(pickU), USERS[pickU]) : '';
-  $('#pwbox').style.display = (unlocked() && LS.get('iseed_tok','')) ? 'none' : '';
-  $('#syncurl').value = SYNC_URL();
+  $('#pwbox').style.display = (unlocked() && LS.get('iseed_dk','')) ? 'none' : '';
+  $('#ghtok').value='';
   $('#umsg').textContent=''; $('#pw').value='';
   openModal('mUser');
 }
@@ -1228,21 +1231,22 @@ async function decryptSeed(pw){
 }
 $('#uok').onclick=async()=>{
   if(!pickU){$('#umsg').textContent='Chọn người dùng.';return}
-  const su=$('#syncurl').value.trim(); if(su!==SYNC_URL()) LS.set('iseed_sync',su);
-  if(!unlocked() || !LS.get('iseed_tok','')){
+  const newTok=$('#ghtok').value.trim();
+  if(!unlocked() || !LS.get('iseed_dk','') || (newTok && !LS.get('iseed_dk',''))){
     const pw=$('#pw').value.trim(); if(!pw){$('#umsg').textContent='Nhập mật khẩu để mở danh sách khách.';return}
     $('#umsg').textContent='Đang mở…';
     try{
       const seed=await decryptSeed(pw);
       seed.forEach(s=>{ if(!CUS.some(c=>c.sid===s.sid)) CUS.push({id:s.sid,...s,sal:'anh/chị',status:'Chưa gọi',missed:0,hen:'',calls:[],extra:{}}) });
-      LS.set('iseed_tok', await sha256hex(pw));
+      LS.set('iseed_dk', await deriveDataKey(pw));
       LS.set('iseed_customers',CUS);
     }catch(err){ $('#umsg').textContent = window.crypto&&crypto.subtle ? 'Sai mật khẩu, thử lại.' : 'Trình duyệt không hỗ trợ giải mã ở đây — hãy mở trang qua https.'; return }
   }
   if(USER&&USER!==pickU&&C) endCallState();
   USER=pickU; LS.set('iseed_user',USER);
   ME=$('#sayname').value.trim()||USERS[USER]; LS.set(meKey(USER),ME);
-  $('#mUser').classList.remove('on'); applyUser(); SCOPE=isMgr()?'all':'mine'; SSCOPE=isMgr()?'all':'mine'; FILTER='all'; showView(isMgr()?'v-rep':'v-list'); pullSync(); pushSync();
+  if(newTok){ $('#umsg').textContent='Đang kết nối lưu trữ…'; const ok=await setupToken(newTok); if(!ok){ $('#umsg').textContent='Mã GitHub không hợp lệ hoặc thiếu quyền Contents: Read and write cho repo iseed-telesale.'; return; } }
+  $('#mUser').classList.remove('on'); applyUser(); SCOPE=isMgr()?'all':'mine'; SSCOPE=isMgr()?'all':'mine'; FILTER='all'; showView(isMgr()?'v-rep':'v-list'); await ensureToken(); pullSync(); pushSync();
 };
 function applyUser(){ $('#uname').textContent = USER || 'Chọn người dùng'; EDITS = USER?LS.get('iseed_edits_'+USER,{}):{}; BASE_EDITS={...BAKED_BASE,...LS.get('iseed_base_edits',{})}; $('#edbtn').style.display=(USER&&!isMgr())?'':'none'; document.body.classList.toggle('mgr',isMgr()); if(!USER||isMgr()) setEdit(false); $('#edBase').style.display=USER==='Chen'?'':'none'; rerenderAll(); }
 $('#userbtn').onclick=openUser;
@@ -1914,67 +1918,127 @@ document.addEventListener('click',e=>{
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') $('#mCus').classList.remove('on'); });
 
 
-/* ================== ĐỒNG BỘ QUA GOOGLE SHEET ================== */
-const DEFAULT_SYNC_URL = '';
-const SYNC_URL = ()=> LS.get('iseed_sync','') || DEFAULT_SYNC_URL;
-async function sha256hex(t){ const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''); }
-let LASTPUSH = LS.get('iseed_lastpush',{}), SYNCST={state:'off',at:null,msg:''}, syncT=null, pulling=false;
+/* ================== LƯU TRỮ CHUNG TRÊN GITHUB (mã hoá) ==================
+   Dữ liệu mỗi người gọi = 1 file mã hoá trên nhánh "data" của repo (không làm website build lại).
+   Khoá mã hoá sinh từ mật khẩu nhóm; mã truy cập GitHub cũng được lưu mã hoá (data/cfg.enc.json). */
+const GH={owner:'trancute3003-cloud',repo:'iseed-telesale',branch:'data'};
+const GHAPI=`https://api.github.com/repos/${GH.owner}/${GH.repo}`;
+const UFILE={'Chen':'data/u-chen.enc.json','Bảo Trân':'data/u-tran.enc.json'};
+const BASEFILE='data/base.enc.json', CFGFILE='data/cfg.enc.json';
+const b64e=u8=>{let s='';u8.forEach(x=>s+=String.fromCharCode(x));return btoa(s)};
+const b64d=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+const utf8b64=t=>b64e(new TextEncoder().encode(t));
+const b64utf8=s=>new TextDecoder().decode(b64d(s.replace(/\s/g,'')));
+async function deriveDataKey(pw){
+  const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']);
+  const k=await crypto.subtle.deriveKey({name:'PBKDF2',salt:new TextEncoder().encode('iseed-telesale-data-v1'),iterations:150000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},true,['encrypt','decrypt']);
+  return b64e(new Uint8Array(await crypto.subtle.exportKey('raw',k)));
+}
+async function dkey2(){ const r=LS.get('iseed_dk',''); if(!r) return null; return crypto.subtle.importKey('raw',b64d(r),{name:'AES-GCM'},false,['encrypt','decrypt']); }
+async function encObj(o){ const k=await dkey2(), iv=crypto.getRandomValues(new Uint8Array(12));
+  const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},k,new TextEncoder().encode(JSON.stringify(o))); return JSON.stringify({v:1,iv:b64e(iv),ct:b64e(new Uint8Array(ct))}); }
+async function decObj(txt){ const j=JSON.parse(txt), k=await dkey2();
+  return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:b64d(j.iv)},k,b64d(j.ct)))); }
+const ghTok=()=>LS.get('iseed_ghtok','');
+const SHAS={};
+async function ghGet(path,auth=true){
+  const h={'Accept':'application/vnd.github+json'}; if(auth&&ghTok()) h.Authorization='Bearer '+ghTok();
+  const r=await fetch(`${GHAPI}/contents/${path}?ref=${GH.branch}&t=${Date.now()}`,{headers:h,cache:'no-store'});
+  if(r.status===404) return null; if(!r.ok) throw new Error('get '+r.status);
+  const j=await r.json(); SHAS[path]=j.sha; return b64utf8(j.content);
+}
+async function ghPut(path,text,msg,retry=true){
+  const body={message:msg,content:utf8b64(text),branch:GH.branch}; if(SHAS[path]) body.sha=SHAS[path];
+  const r=await fetch(`${GHAPI}/contents/${path}`,{method:'PUT',headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+ghTok(),'Content-Type':'application/json'},body:JSON.stringify(body)});
+  if((r.status===409||r.status===422)&&retry){ try{ await ghGet(path); }catch(e){} return ghPut(path,text,msg,false); }
+  if(!r.ok) throw new Error('put '+r.status);
+  const j=await r.json(); SHAS[path]=j.content.sha; return true;
+}
+async function setupToken(tok){
+  try{
+    const r=await fetch(GHAPI,{headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+tok}});
+    if(!r.ok) return false; const j=await r.json(); if(!(j.permissions&&j.permissions.push)) return false;
+    LS.set('iseed_ghtok',tok);
+    try{ await ghGet(CFGFILE); }catch(e){}
+    await ghPut(CFGFILE, await encObj({token:tok,by:USER||'',at:new Date().toISOString()}), 'Cấu hình lưu trữ');
+    return true;
+  }catch(e){ return false; }
+}
+async function ensureToken(){
+  if(ghTok()||!LS.get('iseed_dk','')) return;
+  try{ const t=await ghGet(CFGFILE,false); if(t){ const o=await decObj(t); if(o.token) LS.set('iseed_ghtok',o.token); } }catch(e){}
+}
+let SYNCST={state:'off',at:null,msg:''}, syncT=null, pulling=false, pushing=false, lastPushJ=LS.get('iseed_lastpushj','');
 const touched = c => (c.calls&&c.calls.length) || c.status!=='Chưa gọi' || c.memo || c.lvl || c.zl || c.ml || c.hen;
 function snap(c){ const {id,sid,owner,name,phone,email,title,org,status,hen,memo,missed,calls,zl,ml,lvl,sal,done,note}=c; return {id,sid,owner,name,phone,email,title,org,status,hen,memo,missed,calls,zl,ml,lvl,sal,done,note}; }
 function setSync(state,msg){ SYNCST={state,at:new Date(),msg:msg||''}; const el=$('#syncst'); if(el) el.outerHTML=syncBadge(); }
 function syncBadge(){ const s=SYNCST; const t=s.at?pad2(s.at.getHours())+':'+pad2(s.at.getMinutes()):'';
-  const txt={off:'Chưa kết nối đồng bộ',ok:'Đã đồng bộ '+t,err:'Lỗi đồng bộ '+t+(s.msg?' — '+s.msg:''),busy:'Đang đồng bộ…'}[s.state];
-  return `<span class="syncdot ${s.state}" id="syncst"><i></i>${esc(txt)}</span>`; }
-function schedSync(){ clearTimeout(syncT); syncT=setTimeout(pushSync,1500); }
+  const txt=!ghTok()?'Chưa kết nối lưu trữ chung':{off:'Đang chờ đồng bộ',ok:'Số liệu cập nhật lúc '+t,err:'Lỗi đồng bộ '+t+(s.msg?' — '+s.msg:''),busy:'Đang cập nhật…'}[s.state];
+  return `<span class="syncdot ${ghTok()?s.state:'off'}" id="syncst"><i></i>${esc(txt)}</span>`; }
+function schedSync(){ clearTimeout(syncT); syncT=setTimeout(pushSync,4000); }
 async function pushSync(){
-  const url=SYNC_URL(), key=LS.get('iseed_tok',''); if(!url||!key||!USER||isMgr()) return;
-  const mine=CUS.filter(c=>(!c.owner||c.owner===USER)&&touched(c));
-  const items=mine.map(c=>({c,j:JSON.stringify(snap(c))})).filter(x=>LASTPUSH[x.c.id]!==x.j);
-  if(!items.length) return;
-  setSync('busy');
+  if(!ghTok()||!USER||isMgr()||!UFILE[USER]||pushing) return;
+  const items=CUS.filter(c=>(!c.owner||c.owner===USER)&&touched(c)).map(snap);
+  const j=JSON.stringify(items); if(j===lastPushJ) return;
+  pushing=true; setSync('busy');
   try{
-    for(let i=0;i<items.length;i+=60){
-      const part=items.slice(i,i+60);
-      const res=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({key,action:'upsert',by:USER,items:part.map(x=>({id:x.c.id,data:snap(x.c)}))})});
-      const r=await res.json(); if(!r.ok) throw new Error(r.error||'lỗi');
-      part.forEach(x=>LASTPUSH[x.c.id]=x.j);
-    }
-    LS.set('iseed_lastpush',LASTPUSH); setSync('ok');
-  }catch(e){ setSync('err', e.message==='unauthorized'?'sai mật khẩu':'không kết nối được'); }
+    if(!SHAS[UFILE[USER]]) { try{ await ghGet(UFILE[USER]); }catch(e){} }
+    await ghPut(UFILE[USER], await encObj({user:USER,at:new Date().toISOString(),items}), `Cập nhật dữ liệu ${USER}`);
+    lastPushJ=j; LS.set('iseed_lastpushj',j); setSync('ok');
+  }catch(e){ setSync('err','không lưu được, sẽ thử lại'); }
+  pushing=false;
 }
 async function pullSync(){
-  const url=SYNC_URL(), key=LS.get('iseed_tok',''); if(!url||!key||!USER||pulling) return;
+  if(!ghTok()||!USER||pulling) return;
   pulling=true; setSync('busy');
   try{
-    const res=await fetch(url+(url.includes('?')?'&':'?')+'key='+encodeURIComponent(key)+'&action=all');
-    const r=await res.json(); if(!r.ok) throw new Error(r.error||'lỗi');
-    let changed=false;
-    (r.items||[]).forEach(it=>{
-      if(it.id==='__base_edits__'){ const be=(it.data&&it.data.edits)||{}; LS.set('iseed_base_edits',be); BASE_EDITS={...BAKED_BASE,...be}; return; }
-      const d=it.data; if(!d||!d.id) return;
-      if(!isMgr() && d.owner===USER) return;            // khách của mình: máy mình là bản chuẩn
-      const i=CUS.findIndex(c=>c.id===d.id);
-      if(i>=0){ CUS[i]={...CUS[i],...d}; } else CUS.push({extra:{},...d});
-      changed=true;
-    });
-    if(changed) LS.set('iseed_customers',CUS);
+    const files=CALLERS.filter(u=>isMgr()||u!==USER).map(u=>UFILE[u]);
+    for(const f of files){
+      const t=await ghGet(f); if(!t) continue; const o=await decObj(t);
+      (o.items||[]).forEach(d=>{ if(!d||!d.id) return; if(!isMgr()&&d.owner===USER) return;
+        const i=CUS.findIndex(c=>c.id===d.id); if(i>=0) CUS[i]={...CUS[i],...d}; else CUS.push({extra:{},...d}); });
+    }
+    const bt=await ghGet(BASEFILE); if(bt){ const be=(await decObj(bt)).edits||{}; LS.set('iseed_base_edits',be); BASE_EDITS={...BAKED_BASE,...be}; }
+    LS.set('iseed_customers',CUS);
     setSync('ok'); rerenderAll();
     if($('#v-list').classList.contains('on')) renderList();
     if($('#v-rep').classList.contains('on')) renderRep();
-  }catch(e){ setSync('err', e.message==='unauthorized'?'sai mật khẩu':'không kết nối được'); }
+  }catch(e){ setSync('err','không tải được'); }
   pulling=false;
 }
-setInterval(()=>{ if(USER){ if(isMgr()) pullSync(); else { pushSync(); pullSync(); } } }, 90000);
+setInterval(()=>{ if(USER&&ghTok()){ if(isMgr()) pullSync(); else { pushSync(); pullSync(); } } }, 60000);
+window.addEventListener('beforeunload',()=>{ if(!isMgr()) pushSync(); });
 $('#edBase').onclick=async()=>{
-  const url=SYNC_URL(), key=LS.get('iseed_tok','');
-  if(!url||!key){ toast('Chưa kết nối đồng bộ — xem hướng dẫn cài Google Sheet'); return; }
-  try{ const res=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({key,action:'upsert',by:USER,items:[{id:'__base_edits__',data:{id:'__base_edits__',edits:EDITS,by:USER,at:new Date().toISOString()}}]})});
-    const r=await res.json(); if(!r.ok) throw 0; BASE_EDITS={...EDITS}; LS.set('iseed_base_edits',BASE_EDITS); toast(`Đã đặt ${Object.keys(EDITS).length} câu sửa của Chen làm bản gốc cho nhóm`); }
-  catch(e){ toast('Không gửi được — kiểm tra kết nối đồng bộ'); }
+  if(!ghTok()){ toast('Chưa kết nối lưu trữ chung'); return; }
+  try{ try{ await ghGet(BASEFILE); }catch(e){}
+    await ghPut(BASEFILE, await encObj({edits:EDITS,by:USER,at:new Date().toISOString()}), 'Bản gốc kịch bản');
+    BASE_EDITS={...BAKED_BASE,...EDITS}; LS.set('iseed_base_edits',EDITS); toast(`Đã đặt ${Object.keys(EDITS).length} câu sửa của Chen làm bản gốc cho nhóm`); }
+  catch(e){ toast('Không gửi được — thử lại sau'); }
 };
+
+/* ---------- Xuất Excel báo cáo ---------- */
+function exportExcel(){
+  const lastReal=c=>(c.calls||[]).filter(r=>!r.miss).slice(-1)[0]||{};
+  const sum=CALLERS.map(u=>{const L=CUS.filter(c=>c.owner===u); const n=s=>L.filter(c=>c.status===s).length;
+    return {'Người phụ trách':u,'Tổng khách':L.length,'Đã gọi':L.filter(c=>c.status!=='Chưa gọi').length,'Chưa gọi':n('Chưa gọi'),'Nghe máy':L.filter(c=>(c.calls||[]).some(r=>!r.miss)).length,'MQL':n('MQL'),'MQL Nur':n('MQL Nur'),'UND':n('UND'),'Junk':n('Junk'),'Đồng ý KB Zalo':L.filter(c=>c.zl&&c.zl.acc).length,'Đã gửi tài liệu':L.filter(c=>c.zl&&c.zl.sent).length,'Đang chăm sóc':L.filter(c=>c.zl&&c.zl.care).length,'Hẹn gọi lại':L.filter(c=>c.hen).length};});
+  const det=CUS.filter(c=>CALLERS.includes(c.owner)).sort((a,b)=>origIdx(a)-origIdx(b)).map(c=>{const r=lastReal(c), t=recTopic(r), z=c.zl||{};
+    return {'STT gốc':c.sid?origIdx(c)+1:'','Người phụ trách':c.owner,'Họ tên':c.name,'Cấp chức vụ':LVNAME[lvl(c)],'Chức danh':c.title,'Đơn vị':c.org,'SĐT':c.phone,'Email':r.email||c.email||'','Nhãn':c.status,'Số lần gọi':(c.calls||[]).length,'Không bắt máy':c.missed||0,'Lần gọi cuối':r.ts?recDate(r).split('-').reverse().join('/')+' '+recTime(r):'','Chuyên đề':t?CHIP[t]:(r.f4||''),'Học phần đã nhắc':r.f5||'','Căn cứ xếp loại':r.f3||'','Kênh':r.f7||'','Hẹn':c.hen||'','Đã nghe SSBM':r.f10||'','Ghi chú':[r.f11,c.memo].filter(Boolean).join('; '),'Lý do không quan tâm':r.f12||'','Zalo: gửi LMKB':z.inv?'x':'','Zalo: đồng ý KB':z.acc?'x':'','Zalo: gửi thông tin':z.sent?'x':'','Zalo: đang chăm sóc':z.care?'x':'','Phản hồi Zalo':z.fb||'','Mail: đã báo chị Huyền':c.ml&&c.ml.huyen?'x':''};});
+  const hist=[]; CUS.filter(c=>CALLERS.includes(c.owner)).forEach(c=>(c.calls||[]).forEach(r=>hist.push({'Ngày':recDate(r).split('-').reverse().join('/'),'Giờ':recTime(r),'Người gọi':r.caller||c.owner,'Người phụ trách':c.owner,'Khách':c.name,'SĐT':c.phone,'Kết quả':r.miss?'Không bắt máy':r.f2,'Thời lượng':r.dur||'','Chuyên đề':r.miss?'':(recTopic(r)?CHIP[recTopic(r)]:r.f4||''),'Căn cứ':r.f3||'','Kênh':r.f7||''})));
+  hist.sort((a,b)=>(a['Ngày'].split('/').reverse().join('')+a['Giờ']).localeCompare(b['Ngày'].split('/').reverse().join('')+b['Giờ']));
+  if(!window.XLSX){ // dự phòng: xuất CSV mở bằng Excel
+    const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"'; const cols=Object.keys(det[0]||{'Họ tên':''});
+    const csv='\ufeff'+[cols.map(q).join(','),...det.map(r=>cols.map(k=>q(r[k])).join(','))].join('\r\n');
+    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})); a.download=`iSEED-bao-cao-telesale-${dkey(new Date())}.csv`; document.body.appendChild(a); a.click(); a.remove(); return; }
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(sum),'Tổng hợp');
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(det),'Chi tiết khách');
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(hist),'Lịch sử gọi');
+  XLSX.writeFile(wb,`iSEED-bao-cao-telesale-${dkey(new Date())}.xlsx`);
+}
 
 /* ================== BÁO CÁO TIẾN ĐỘ ================== */
 $('#rrefresh').onclick=()=>pullSync();
+$('#rexcel').onclick=exportExcel;
 function renderRep(){
   $('#rsub').innerHTML=`Chen · Bảo Trân · 341 khách nhóm chưa dự Hội thảo 24/10 &nbsp; ${syncBadge()}`;
   const realCalls=c=>(c.calls||[]).filter(r=>!r.miss);
@@ -2015,7 +2079,7 @@ function renderRep(){
       <td style="font-size:13px">${esc(t?CHIP[t]:(r.f4||'—'))}</td><td>${c.ml&&c.ml.huyen?'<span class="badge MQLNur">Đã báo chị Huyền</span>':'<span class="badge">Chưa báo</span>'}</td><td>${ownCell(c)}</td></tr>`}).join('');
   const total=CUS.filter(c=>CALLERS.includes(c.owner)), done=total.filter(c=>c.status!=='Chưa gọi').length;
   $('#repwrap').innerHTML=`
-    ${(!SYNC_URL()||!LS.get('iseed_tok',''))?`<div class="why" style="margin-top:0"><strong>Chưa kết nối đồng bộ</strong>Số liệu dưới đây mới chỉ là dữ liệu trên máy này. Khi đã cài Google Sheet (⚙️ Đồng bộ báo cáo trong nút 👤), báo cáo sẽ gồm kết quả của cả Chen và Trân.</div>`:''}
+    ${!ghTok()?`<div class="why" style="margin-top:0"><strong>Chưa kết nối lưu trữ chung</strong>Số liệu dưới đây mới là dữ liệu trên máy này. Sau khi kết nối (một lần, ở nút 👤 → ⚙️ Kết nối lưu trữ chung), báo cáo tự gộp kết quả của cả Chen và Trân.</div>`:''}
     <div class="sumcards">${[[total.length,'Tổng khách'],[done,'Đã gọi'],[total.length-done,'Chưa gọi'],[total.filter(c=>c.status==='MQL').length,'MQL'],[total.filter(c=>c.status==='MQL Nur').length,'MQL Nur'],[total.filter(c=>c.status==='UND').length,'UND'],[total.filter(c=>c.status==='Junk').length,'Junk']].map(x=>`<div class="sc"><b>${x[0]}</b><span>${x[1]}</span></div>`).join('')}</div>
     <div class="rgrid">${card}</div>
     <div class="rgrid">
@@ -2035,7 +2099,7 @@ $('#repwrap').addEventListener('click',e=>{ if(e.target.closest('button')) retur
 tabs[1].classList.add('on');
 applyUser();
 showView(isMgr()?'v-rep':'v-list');
-if(!USER||!unlocked()) openUser(); else { pullSync(); pushSync(); }
+if(!USER||!unlocked()||!LS.get('iseed_dk','')) openUser(); else { ensureToken().then(()=>{ pullSync(); pushSync(); }); }
 </script>
 </body>
 </html>
