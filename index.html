@@ -687,7 +687,7 @@ td.zcell.ok{background:#e9f6ee}
 <section class="tab" id="t-zalo" data-title="Zalo mẫu & lịch nhắc" data-n="10">
   <h1>Tin nhắn mẫu gửi Zalo và lịch nhắc</h1>
   <p class="lead">Bấm “Copy” rồi dán vào Zalo. Tên, đề tài, kênh tự điền theo thanh trên cùng và phiếu ghi nhận.</p>
-  <div class="say alt" data-label="LỜI MỜI KẾT BẠN ZALO" data-s>Chào {Kh}, em vừa gọi từ viện iSEED để thông tin đến {kh} về khóa học Mini MBA in Healthcare. Em xin phép kết bạn để gửi tài liệu chi tiết ạ.</div>
+  <div class="say alt" data-label="LỜI MỜI KẾT BẠN ZALO" data-s>Chào {Kh}, em vừa gọi từ viện iSEED để thông tin đến {Kh} về khóa học Mini MBA in Healthcare Service Management. Em xin phép kết bạn để gửi tài liệu chi tiết ạ.</div>
   <div class="say alt" data-label="NGAY SAU KHI KẾT BẠN" data-s>Dạ em chào {Kh} {ten},
 Em là {em}, từ Viện Phát triển Giáo dục và Quản trị Bền vững (iSEED). Sau sự kiện ngày 24/10, em xin gửi {Kh} thông tin chi tiết về chương trình Mini MBA in Healthcare Service Management để {Kh} tham khảo. Đặc biệt, khách tham dự sự kiện ngày 24/10 đang được áp dụng chính sách học bổng và ưu đãi học phí riêng của chương trình
 📎 Em gửi kèm:
@@ -955,7 +955,7 @@ const T = {
   stop:'Dạ em cảm ơn {kh} và xin lỗi vì đã làm phiền {kh} ạ.',
   zNow:'Dạ em chào {Kh} {ten},\nEm là {em}, từ Viện Phát triển Giáo dục và Quản trị Bền vững (iSEED). Sau sự kiện ngày 24/10, em xin gửi {Kh} thông tin chi tiết về chương trình Mini MBA in Healthcare Service Management để {Kh} tham khảo. Đặc biệt, khách tham dự sự kiện ngày 24/10 đang được áp dụng chính sách học bổng và ưu đãi học phí riêng của chương trình\n📎 Em gửi kèm:\n- Thư ngỏ chương trình (thông tin chi tiết các học phần, chính sách học bổng dành cho khách tham dự sự kiện)\n- Brochure chương trình (nội dung tổng quan chương trình và đội ngũ giảng viên)\nKhi thuận tiện, kính mong {Kh} dành thời gian xem qua tài liệu. Em rất mong nhận được phản hồi của {Kh} để có thể tư vấn đầy đủ hơn về chương trình cũng như các chính sách ưu đãi khi đơn vị đăng ký theo nhóm.\nTrân trọng cảm ơn {Kh} và mong sớm nhận được phản hồi ạ.',
   zHen:'Dạ em đã ghi nhận thông tin của {kh}. Chuyên viên tư vấn của Viện sẽ liên hệ {kh} vào {hen} để trao đổi chi tiết hơn về chương trình ạ. Nếu khung giờ đó không tiện, {kh} nhắn lại giúp em nhé. Em cảm ơn {kh}!',
-  zInv:'Chào {Kh}, em vừa gọi từ viện iSEED để thông tin đến {kh} về khóa học Mini MBA in Healthcare. Em xin phép kết bạn để gửi tài liệu chi tiết ạ.',
+  zInv:'Chào {Kh}, em vừa gọi từ viện iSEED để thông tin đến {Kh} về khóa học Mini MBA in Healthcare Service Management. Em xin phép kết bạn để gửi tài liệu chi tiết ạ.',
   zMiss:'Dạ em chào {kh}, em là {em} bên Viện iSEED. Em có gọi {kh} hai lần nhưng chưa liên lạc được ạ. Em xin phép gửi qua đây thông tin chương trình đào tạo của Viện và chính sách học bổng dành cho {kh} làm trong lĩnh vực y tế. Khi nào thuận tiện {kh} nhắn lại giúp em nhé. Em cảm ơn {kh}!',
 };
 const obj = id => OBJS.find(o=>o.id===id).b.filter(x=>x[0]!=='jump');
@@ -1125,7 +1125,7 @@ const shortName = n=>{const p=String(n||'').trim().split(/\s+/);return p[p.lengt
 const DEF = {ten:'…', em:'…', hp:'[tên học phần]', tools:'[2 công cụ của học phần]', detai:'[đề tài khách chọn]', usp:'[Chưa chọn đề tài]', hen:'…'};
 function vals(){
   const t=topic(), cu=curCus(), sal=C?C.sal:'anh/chị';
-  return {kh:sal, Kh:cap(sal), ten:cu?shortName(cu.name):'', em:ME,
+  return {kh:sal, Kh:sal.split('/').map(cap).join('/'), ten:cu?shortName(cu.name):'', em:ME,
     hp:t&&`${t.hpNo} — ${t.hpName}`, tools:t&&t.tools.join(' và '), detai:t?t.detai:'', usp:t&&t.usp,
     hen:C&&C.rec.f9&&C.rec.f9!=='chưa hẹn'?C.rec.f9:''};
 }
