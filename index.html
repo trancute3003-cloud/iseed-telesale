@@ -361,6 +361,14 @@ body.mgr #sumwrap textarea{pointer-events:none;background:#f8f6f1}
 body.mgr #sumwrap [data-call]{display:none}
 .ownb{display:inline-block;color:#fff;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:700;white-space:nowrap}
 td.ownc{vertical-align:middle}
+.ccell{font-size:12.5px;min-width:230px;max-width:340px;white-space:pre-wrap;word-break:break-word;line-height:1.45}
+.ccell div{margin-bottom:3px}
+.ccell .zl{font-weight:700;color:var(--gold)}
+.ccell .recedit{margin-top:4px;padding:2px 8px}
+.hcall.editing{background:#fffaf0;border-color:var(--green-l);box-shadow:0 0 0 2px #f3e3b5}
+.dedit textarea{width:100%;min-height:70px;border:1px solid var(--line);border-radius:8px;padding:7px 9px;background:#fff;font:inherit;font-size:14px}
+.kv2 dd{white-space:pre-wrap;word-break:break-word}
+.mgr .recedit{display:none!important}
 /* list */
 .lhead{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;margin-bottom:14px}
 .lhead h1{margin:0}
@@ -1817,7 +1825,7 @@ function renderSum(){
       <td><span class="badge ${c.status.replace(' ','')}">${esc(c.status)}</span></td>
       <td style="font-size:13px">${esc(r?r.f4:'')}</td>
       <td style="font-size:13px">${esc(r?r.f7:'')}${r&&r.f9&&r.f9!=='chưa hẹn'?`<br>🗓️ ${esc(r.f9)}`:''}</td>
-      <td style="font-size:12.5px;max-width:260px">${esc(r?r.f3:'')}</td>
+      <td class="ccell">${(()=>{const parts=[r&&r.f3?`<div>${esc(r.f3)}</div>`:'', r&&r.f11?`<div><span class="zl">Ghi chú:</span> ${esc(r.f11)}</div>`:'', c.memo?`<div><span class="zl">📝</span> ${esc(c.memo)}</div>`:''].join(''); return (parts||'<span class="note">—</span>')+(r?`<button class="btn sm recedit" data-editlast="${c.id}">✏️ Sửa</button>`:'');})()}</td>
       <td><button class="btn sm" data-call="${c.id}">📞</button></td></tr>`}).join('');
   const zrows=zalo.map(x=>{const c=x.c,r=x.last; let tplBtn='<span class="note">—</span>';
     { const [,inv]=fillFor(c,TXT('T.zInv',T.zInv),null,''); SAYI.push(inv); tplBtn=`<button class="btn sm" data-sumcp="${SAYI.length-1}" title="Dán vào lời mời kết bạn Zalo">① Copy lời mời kết bạn</button>`; }
@@ -1837,7 +1845,7 @@ function renderSum(){
       <td style="font-size:13px">${esc(r.f4||'—')}<br><span class="note">${esc(r.f5||'')}</span></td>
       <td><label class="zstep ${ml.huyen?'ok':''}"><input type="checkbox" data-ml="${c.id}" ${ml.huyen?'checked':''}> Thông tin đến chị Huyền</label></td></tr>`}).join('');
   $('#sumwrap').innerHTML=`<div class="sumcards">${card(D.length,'Khách đã tương tác')}${card(answered,'Nghe máy')}${card(D.filter(x=>!x.last).length,'Chỉ không bắt máy')}${card(cnt('MQL'),'MQL')}${card(cnt('MQL Nur'),'MQL Nur')}${card(cnt('UND'),'UND')}${card(cnt('Junk'),'Junk')}</div>
-    <div class="card" style="padding:0;overflow:auto"><table class="ctable" style="border:0"><thead><tr><th>STT gốc</th><th>Khách</th>${OC?'<th>Người phụ trách</th>':''}<th>SĐT</th><th>Tương tác trong ngày</th><th>Nhãn</th><th>Đề tài</th><th>Kênh · hẹn</th><th>Căn cứ</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="card" style="padding:0;overflow:auto"><table class="ctable" style="border:0"><thead><tr><th>STT gốc</th><th>Khách</th>${OC?'<th>Người phụ trách</th>':''}<th>SĐT</th><th>Tương tác trong ngày</th><th>Nhãn</th><th>Đề tài</th><th>Kênh · hẹn</th><th>Căn cứ · ghi chú</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
     <div class="sumsec"><h2>💬 Khách cần tương tác qua Zalo <span class="cnt">${zalo.length}</span></h2>
       ${zalo.length?`<div class="card" style="padding:0;overflow:auto"><table style="border:0"><thead><tr><th rowspan="2">Khách</th>${OC?'<th rowspan="2">Người phụ trách</th>':''}<th rowspan="2">SĐT Zalo · tin nhắn</th><th colspan="4" class="zgrp">Việc cần làm</th><th rowspan="2">Phản hồi</th></tr>
 <tr><th class="zh">Gửi lời mời kết bạn</th><th class="zh">Đồng ý kết bạn</th><th class="zh">Gửi thông tin chương trình</th><th class="zh">Đang chăm sóc</th></tr></thead><tbody>${zrows}</tbody></table></div>`:'<p class="note">Không có khách nào cần nhắn Zalo trong ngày này.</p>'}</div>
@@ -1848,6 +1856,7 @@ function renderSum(){
 $('#sumwrap').addEventListener('input',e=>{const id=e.target.dataset.zfb; if(!id) return; const c=CUS.find(x=>x.id===id); c.zl=c.zl||{}; c.zl.fb=e.target.value; clearTimeout(e.target._t); e.target._t=setTimeout(saveCus,400);});
 $('#sumwrap').addEventListener('click',e=>{
   const c=e.target.closest('[data-call]'); if(c){startCall(c.dataset.call);return}
+  const el=e.target.closest('[data-editlast]'); if(el){openCus(el.dataset.editlast,true);return}
   const o=e.target.closest('[data-open]'); if(o&&!e.target.closest('button,input,a')){openCus(o.dataset.open);return}
   const s=e.target.closest('[data-sumcp]'); if(s){copy($('#sumwrap')._says[+s.dataset.sumcp]);}
 });
@@ -1877,15 +1886,42 @@ function orgHover(org){
 /* ================== PHIẾU KHÁCH (bấm vào khách) ================== */
 const FLD=[['f2','Nhãn'],['f3','Căn cứ xếp loại'],['f4','Đề tài khách chọn'],['f5','Học phần đã nhắc'],['f6','Lĩnh vực · vị trí · thời điểm · ai quyết định'],['f7','Kênh'],['email','Email'],['f8','Đã gửi tài liệu'],['f9','Khung giờ hẹn'],['f10','Đã nghe SSBM'],['f11','Ghi chú'],['f12','Lý do không quan tâm'],['f1','Nguồn']];
 let OPENID=null;
-function openCus(id){ OPENID=id; renderCus(); $('#mCus').classList.add('on'); }
+let EDITIDX=-1;
+function openCus(id,editLast){ OPENID=id; const c=CUS.find(x=>x.id===id); EDITIDX=-1;
+  if(editLast&&c){ for(let i=(c.calls||[]).length-1;i>=0;i--){ if(!c.calls[i].miss){ EDITIDX=i; break; } } }
+  renderCus(); $('#mCus').classList.add('on');
+  if(EDITIDX>=0) setTimeout(()=>{const el=$('#recform'); if(el){el.scrollIntoView({block:'center'}); const t=el.querySelector('[data-rf=f3]'); t&&t.focus();}},80); }
+function recEditHTML(r,idx,d){
+  const sel=(k,opts)=>`<select data-rf="${k}">${opts.map(o=>`<option ${String(r[k]||'')===o?'selected':''}>${o}</option>`).join('')}</select>`;
+  const ta=(k,ph)=>`<textarea data-rf="${k}" placeholder="${ph||''}">${esc(r[k]||'')}</textarea>`;
+  const inp=(k,ph)=>`<input data-rf="${k}" value="${esc(r[k]||'')}" placeholder="${ph||''}">`;
+  return `<div class="hcall editing" id="recform"><div class="hh"><span class="t">${esc(recTime(r))} · ${esc(d.slice(8,10)+'/'+d.slice(5,7))}</span><b style="color:var(--gold)">✏️ Đang sửa phiếu</b></div>
+    <div class="dedit">
+      <div><label>Nhãn</label>${sel('f2',['MQL','MQL Nur','UND','Junk'])}</div>
+      <div><label>Kênh</label>${sel('f7',['','Zalo','Email','Chưa có kênh'])}</div>
+      <div class="full"><label>Căn cứ xếp loại — điều khách nói ra</label>${ta('f3')}</div>
+      <div class="full"><label>Ghi chú</label>${ta('f11')}</div>
+      <div><label>Đề tài khách chọn</label>${inp('f4')}</div>
+      <div><label>Học phần đã nhắc</label>${inp('f5')}</div>
+      <div class="full"><label>Lĩnh vực · vị trí · thời điểm · ai quyết định</label>${inp('f6')}</div>
+      <div><label>Email</label>${inp('email')}</div>
+      <div><label>Đã gửi tài liệu</label>${sel('f8',['','Đã gửi','Chưa gửi'])}</div>
+      <div><label>Khung giờ hẹn</label>${inp('f9','chưa hẹn')}</div>
+      <div><label>Đã nghe SSBM</label>${inp('f10')}</div>
+      <div class="full"><label>Lý do không quan tâm</label>${inp('f12')}</div>
+      <div class="full bar" style="margin:0"><button class="btn primary" data-recsave="${idx}">💾 Lưu phiếu</button><button class="btn" data-reccancel>Huỷ</button></div>
+    </div></div>`;
+}
 function renderCus(){
   const c=CUS.find(x=>x.id===OPENID); if(!c) return;
   const calls=(c.calls||[]).slice().reverse();
-  const hist=calls.length?calls.map(r=>{
-    const d=recDate(r);
+  const N0=(c.calls||[]).length;
+  const hist=calls.length?calls.map((r,ri)=>{
+    const d=recDate(r); const idx=N0-1-ri;
+    if(!r.miss && EDITIDX===idx) return recEditHTML(r,idx,d);
     if(r.miss) return `<div class="hcall miss"><div class="hh"><span class="t">${esc(recTime(r))} · ${esc(d.slice(8,10)+'/'+d.slice(5,7))}</span>📵 Không bắt máy / không gọi được${r.caller?` · ${esc(r.caller)}`:''}</div></div>`;
     const rows=FLD.filter(f=>f[0]!=='f2'&&r[f[0]]&&String(r[f[0]]).trim()).map(f=>`<dt>${f[1]}</dt><dd>${esc(r[f[0]])}</dd>`).join('');
-    return `<div class="hcall"><div class="hh"><span class="t">${esc(recTime(r))} · ${esc(d.slice(8,10)+'/'+d.slice(5,7))}</span><span class="badge ${String(r.f2||'').replace(' ','')}">${esc(r.f2||'—')}</span>${r.dur?`<span class="note">⏱ ${esc(r.dur)}</span>`:''}${r.caller?`<span class="note">· ${esc(r.caller)}</span>`:''}</div><dl class="kv2">${rows||'<dd class="note">Không có ghi chú.</dd>'}</dl></div>`}).join('')
+    return `<div class="hcall"><div class="hh"><span class="t">${esc(recTime(r))} · ${esc(d.slice(8,10)+'/'+d.slice(5,7))}</span><span class="badge ${String(r.f2||'').replace(' ','')}">${esc(r.f2||'—')}</span>${r.dur?`<span class="note">⏱ ${esc(r.dur)}</span>`:''}${r.caller?`<span class="note">· ${esc(r.caller)}</span>`:''}<button class="btn sm recedit" data-recedit="${idx}" style="margin-left:auto">✏️ Sửa phiếu</button></div><dl class="kv2">${rows||'<dd class="note">Không có ghi chú.</dd>'}</dl></div>`}).join('')
     : '<p class="note" style="margin:0">Chưa gọi lần nào.</p>';
   $('#mCusBody').innerHTML=`
     <div class="dhd"><div><h2>${esc(c.name||'(chưa có tên)')}</h2><small>${esc([c.title,c.org].filter(Boolean).join(' · '))}${c.owner?` · 👤 ${esc(c.owner)}`:''}</small>
@@ -1913,6 +1949,13 @@ document.addEventListener('click',e=>{
   if(!e.target.closest('#mCus')) return;
   const c=e.target.closest('#mCus [data-call]'); if(c){ $('#mCus').classList.remove('on'); startCall(c.dataset.call); return; }
   const m=e.target.closest('#mCus [data-miss]'); if(m){ $('#mCus').classList.remove('on'); missed(m.dataset.miss); return; }
+  const re=e.target.closest('[data-recedit]'); if(re){ EDITIDX=+re.dataset.recedit; renderCus(); setTimeout(()=>{const el=$('#recform'); el&&el.scrollIntoView({block:'center'})},50); return; }
+  if(e.target.closest('[data-reccancel]')){ EDITIDX=-1; renderCus(); return; }
+  const rs=e.target.closest('[data-recsave]'); if(rs){ const cu=CUS.find(x=>x.id===OPENID), i=+rs.dataset.recsave, r=cu.calls[i];
+    $$('#recform [data-rf]').forEach(el=>{ r[el.dataset.rf]=el.value.trim(); });
+    let lastReal=-1; for(let k=cu.calls.length-1;k>=0;k--){ if(!cu.calls[k].miss){ lastReal=k; break; } }
+    if(i===lastReal){ if(r.f2) cu.status=r.f2; cu.hen=r.f9&&r.f9!=='chưa hẹn'?r.f9:''; if(r.email) cu.email=r.email; }
+    EDITIDX=-1; saveCus(); renderCus(); if($('#v-list').classList.contains('on')) renderList(); if($('#v-sum').classList.contains('on')) renderSum(); toast('Đã lưu phiếu'); return; }
   if(e.target.id==='cuSave'){ const cu=CUS.find(x=>x.id===OPENID); cu.status=$('#cuSt').value; cu.hen=$('#cuHen').value.trim(); cu.memo=$('#cuMemo').value.trim(); saveCus(); renderCus(); if($('#v-list').classList.contains('on')) renderList(); toast('Đã lưu phiếu khách'); }
 });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') $('#mCus').classList.remove('on'); });
