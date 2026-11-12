@@ -1552,6 +1552,7 @@ function renderEnd(){
     if(e.target.id==='cpRec'){const r=collect(curLab);copy(XCOLS.map(x=>String(({...cu,...r,status:curLab,hen:r.f9})[x[0]]??'').replace(/[\t\n]+/g,' ')).join('\t'))}
   };
   $('#e9').oninput=e=>{C.rec.f9=e.target.value.trim()};
+  $('#e3').oninput=e=>{ $('#cnote').value=e.target.value; };
 }
 function collect(lab){
   const rv=n=>{const i=$(`#card input[name=${n}]:checked`);return i?i.value:''};
@@ -1560,6 +1561,7 @@ function collect(lab){
     f11:[...$$('#card input[name=e11]:checked').map(i=>i.value),$('#e11b').value.trim()].filter(Boolean).join('; '), f12:$('#e12').value.trim(), path:[...C.visited].join('>')};
 }
 function saveCall(lab,next){
+  if(document.activeElement&&document.activeElement.blur) document.activeElement.blur();
   const cu=curCus(), r=collect(lab);
   cu.calls=cu.calls||[]; cu.calls.push(r); cu.status=lab; cu.hen=r.f9&&r.f9!=='chưa hẹn'?r.f9:''; if(r.email) cu.email=r.email;
   saveCus(); const id=cu.id; endCallState(); toast('Đã lưu cuộc gọi');
@@ -1951,7 +1953,7 @@ document.addEventListener('click',e=>{
   const m=e.target.closest('#mCus [data-miss]'); if(m){ $('#mCus').classList.remove('on'); missed(m.dataset.miss); return; }
   const re=e.target.closest('[data-recedit]'); if(re){ EDITIDX=+re.dataset.recedit; renderCus(); setTimeout(()=>{const el=$('#recform'); el&&el.scrollIntoView({block:'center'})},50); return; }
   if(e.target.closest('[data-reccancel]')){ EDITIDX=-1; renderCus(); return; }
-  const rs=e.target.closest('[data-recsave]'); if(rs){ const cu=CUS.find(x=>x.id===OPENID), i=+rs.dataset.recsave, r=cu.calls[i];
+  const rs=e.target.closest('[data-recsave]'); if(rs){ if(document.activeElement&&document.activeElement.blur) document.activeElement.blur(); const cu=CUS.find(x=>x.id===OPENID), i=+rs.dataset.recsave, r=cu.calls[i];
     $$('#recform [data-rf]').forEach(el=>{ r[el.dataset.rf]=el.value.trim(); });
     let lastReal=-1; for(let k=cu.calls.length-1;k>=0;k--){ if(!cu.calls[k].miss){ lastReal=k; break; } }
     if(i===lastReal){ if(r.f2) cu.status=r.f2; cu.hen=r.f9&&r.f9!=='chưa hẹn'?r.f9:''; if(r.email) cu.email=r.email; }
@@ -2137,6 +2139,8 @@ function renderRep(){
     <p class="note" style="margin-top:18px">Bấm vào tên khách để xem phiếu đánh giá chi tiết. Xem danh sách từng ngày ở mục 📊 Tổng kết.</p>`;
 }
 $('#repwrap').addEventListener('click',e=>{ if(e.target.closest('button')) return; const o=e.target.closest('[data-open]'); if(o) openCus(o.dataset.open); });
+
+$('#cnote').addEventListener('input',e=>{ const t=$('#e3'); if(t) t.value=e.target.value; });
 
 /* ================== KHỞI ĐỘNG ================== */
 tabs[1].classList.add('on');
